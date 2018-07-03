@@ -2,12 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
-//	static boolean isYao9(int id){
-//		for(int i=0;i<yao9.length;i++){
-//			if(i==id)return true;
-//		}
-//		return false;
-//	}
 
 	public static List<Agari> agariEnum(Player player, int agarihai, boolean isTumo, List<Tile> dorahyouList){
 		player.printTehai();
@@ -161,7 +155,7 @@ class Agari{
 	public boolean isYao9(int id){
 		return !((1<=id&&id<=7)||(10<=id&&id<=16)||(19<=id&&id<=25));
 	}
-	
+
 	boolean[] yaku=new boolean[36];
 	static final int[] yakuHan={
 			1,2,1,1,1,1,1,1,1,1,
@@ -173,14 +167,14 @@ class Agari{
 			"場風","白","發","中","タンヤオ","ピンフ","イーペーコー","三色同順","三色同順",
 			"三色同刻","三暗刻","一気通貫","一気通貫","七対子","トイトイ","チャンタ","チャンタ","三槓子",
 			"リャンペーコー","純チャン","純チャン","ホンイツ","ホンイツ","小三元","ホンロートー","チンイツ","チンイツ"};
-	
+
 	Player p;
 	int head;
 	Mentu[] mentu=new Mentu[4];
 	MatiType mati;
 	boolean isTumo;
 	int num_dora=0;
-	
+
 	boolean isChitoi=false;
 	int[] chitoiPair=new int[7];
 	boolean isKokushi=false;
@@ -297,7 +291,7 @@ class Agari{
 		}
 		yaku[22]=isChitoi;
 		yaku[23]=(kouList.size()==4);
-		if(isYao9(head) 
+		if(isYao9(head)
 				&& (isYao9(mentu[0].pai[0])||isYao9(mentu[0].pai[1])||isYao9(mentu[0].pai[2]))
 				&& (isYao9(mentu[1].pai[0])||isYao9(mentu[1].pai[1])||isYao9(mentu[1].pai[2]))
 				&& (isYao9(mentu[2].pai[0])||isYao9(mentu[2].pai[1])||isYao9(mentu[2].pai[2]))
@@ -313,7 +307,7 @@ class Agari{
 					yaku[28]=true;
 				}else{
 					yaku[29]=true;
-				}				
+				}
 			}
 		}
 		yaku[26]=(cnt_kan==3);
@@ -334,7 +328,7 @@ class Agari{
 					yaku[34]=true;
 				}else{
 					yaku[35]=true;
-				}				
+				}
 			}
 		}
 		if(head==31 && kouList.contains(32) && kouList.contains(33)
@@ -344,9 +338,9 @@ class Agari{
 		}
 		yaku[33]=yaku[23]&&(yaku[24]||yaku[25]);
 		if(yaku[33]) yaku[24]=yaku[25]=false;
-		
+
 	}
-	
+
 	void countDora(List<Tile> dorahyouList){
 		for(Tile t:dorahyouList){
 			int dora=-1;
@@ -361,7 +355,7 @@ class Agari{
 			num_dora+=p.te[dora];
 		}
 	}
-	
+
 	void printYaku(){
 		int han=num_dora;
 		for(int i=0;i<36;i++){

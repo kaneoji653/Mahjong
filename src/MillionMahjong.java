@@ -143,7 +143,7 @@ public class MillionMahjong {
 			}
 
 			total_kan=player[0].num_kan+player[1].num_kan+player[2].num_kan+player[3].num_kan;
-			
+
 			while(dorahyouList.size()!=1+total_kan){
 				dorahyouList.add(wanpai.remove(0));
 			}
