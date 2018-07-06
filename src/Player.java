@@ -26,6 +26,7 @@ public class Player {
 
 	Player(String name, int bakaze,int jikaze) {
 		this.name = name;
+		this.bakaze=bakaze;
 		this.jikaze=jikaze;
 		ai = new PlayerAI();
 	}

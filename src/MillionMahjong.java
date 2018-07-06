@@ -322,7 +322,7 @@ public class MillionMahjong {
 		return shanten;
 	}
 
-	static int selectBlock(int[] te, int men, int ta, int head, boolean flg) {
+	static int selectBlock(int[] te, int men, int ta, int head, boolean shortcut) {
 		if (men + ta == 4) {
 			return 8 - 2 * men - ta - head;
 		}
@@ -344,7 +344,7 @@ public class MillionMahjong {
 		}
 
 		// 面子選択
-		if(flg){
+		if(shortcut){
 			List<int[]> mentuKouho = new ArrayList<>();
 			for (int i = 0; i < 34; i++) {
 				if (te[i] >= 3) {
@@ -390,7 +390,7 @@ public class MillionMahjong {
 		for (int[] t : tatuKouho) {
 			te[t[0]]--;
 			te[t[1]]--;
-			min_shanten = Math.min(min_shanten, selectBlock(te, men, ta + 1, head, true));
+			min_shanten = Math.min(min_shanten, selectBlock(te, men, ta + 1, head,false));
 			te[t[0]]++;
 			te[t[1]]++;
 		}
