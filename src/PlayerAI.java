@@ -1,39 +1,32 @@
 
 public class PlayerAI {
+	boolean naki=false;
 	boolean kakanSelect(int id) {
-		return true;
-		// return false;
+		return naki;
 	}
 
 	boolean minkanSelect(int id) {
-		return true;
-		// return false;
-
+		 return naki;
 	}
 
 	boolean ankanSelect(int id) {
-		return true;
+		return false;
 	}
 
 	boolean ponSelect(int id) {
-		return true;
-		// return false;
+		return naki;
 	}
 
 	boolean chii0Select(int id) {
-		// return true;
-		return false;
+		return naki;
 	}
 
 	boolean chii1Select(int id) {
-		// return true;
-		return false;
+		return naki;
 	}
 
 	boolean chii2Select(int id) {
-		// return true;
-		return false;
-
+		return naki;
 	}
 
 	boolean reachSelect() {

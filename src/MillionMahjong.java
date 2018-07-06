@@ -75,7 +75,7 @@ public class MillionMahjong {
 							dorahyouList.add(wanpai.remove(0));
 						}
 					}
-					Util.agariEnum(p, tumohai.id, true, dorahyouList);
+					Util.agari(p, tumohai.id, true, dorahyouList);
 					houra = ban;
 					break dahaiWait;
 				}
@@ -120,7 +120,7 @@ public class MillionMahjong {
 												dorahyouList.add(wanpai.remove(0));
 											}
 										}
-										Util.agariEnum(ro, id, false, dorahyouList);
+										Util.agari(ro, id, false, dorahyouList);
 										break dahaiWait;
 									}
 								}
@@ -163,7 +163,7 @@ public class MillionMahjong {
 								dorahyouList.add(wanpai.remove(0));
 							}
 						}
-						Util.agariEnum(ro, da.id, false, dorahyouList);
+						Util.agari(ro, da.id, false, dorahyouList);
 
 						houra = (ban + i) % 4;
 						break dahaiWait;

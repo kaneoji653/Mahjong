@@ -4,9 +4,8 @@ import java.util.List;
 
 public class Util {
 
-	public static List<Agari> agariEnum(Player player, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
+	public static Agari agari(Player player, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
 		player.printTehai();
-		// int[] te = player.te;
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
@@ -101,19 +100,16 @@ public class Util {
 				}
 
 				// あがり生成
-				agari.add(new Agari(player, head, mentu4, mati, isTumo, dorahyouList));
+				agari.add(new Agari(player, head, mentu4, mati, isTumo, dorahyouList,false,false));
 			}
 		}
 
-		// あがり候補のスコアを計算して、最大値をとる。(未)
 		if (agari.isEmpty()) {
-			System.out.println("ちーといorこくし");
-			System.out.println(player.tehai);
+			if(headKouho.size()==7){
+				agari.add(new Agari(player, -1, null, MatiType.TANKI, isTumo, dorahyouList,true,false));
+			}
 		}
-		// for(Agari a:agari){
-		// System.out.println(a);
-		// }
-		return agari;
+		return agari.get(0);
 	}
 }
 
@@ -135,11 +131,11 @@ class Mentu {
 	@Override
 	public String toString() {
 		if (type == MentuType.PON || type == MentuType.CHI || type == MentuType.MINKAN) {
-			return "(" + (pai[0] / 9 + 1) + (pai[1] / 9 + 1) + (pai[2] / 9 + 1)
-					+ (type == MentuType.MINKAN ? pai[3] / 9 + 1 : "") + shu + ")";
+			return "(" + (pai[0] % 9 + 1) + (pai[1] % 9 + 1) + (pai[2] % 9 + 1)
+					+ (type == MentuType.MINKAN ? pai[3] % 9 + 1 : "") + shu + ")";
 		} else {
-			return "[" + (pai[0] / 9 + 1) + (pai[1] / 9 + 1) + (pai[2] / 9 + 1)
-					+ (type == MentuType.MINKAN ? pai[3] / 9 + 1 : "") + shu + "]";
+			return "[" + (pai[0] % 9 + 1) + (pai[1] % 9 + 1) + (pai[2] % 9 + 1)
+					+ (type == MentuType.ANKAN ? pai[3] % 9 + 1 : "") + shu + "]";
 		}
 	}
 }

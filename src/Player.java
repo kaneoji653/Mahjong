@@ -66,7 +66,7 @@ public class Player {
 	}
 
 	void minkan(int id) {
-		// System.out.println(this.name+"：カン！("+t+")");
+//		System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id] -= 3;
 		tehai.remove(tehai.indexOf(new Tile(id)));
 		tehai.remove(tehai.indexOf(new Tile(id)));
@@ -80,16 +80,16 @@ public class Player {
 	}
 
 	void kakan(int id) {
-		// System.out.println(this.name+"：カン！("+t+")");
+//		 System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id]--;
 		tehai.remove(tehai.indexOf(new Tile(id)));
 
 		Mentu f = null;
-		for (int i = 0; i < num_fuuro; i++) {
+		for (int i = 0; i < fuuro.size(); i++) {
 			f = fuuro.get(i);
 			if (f.type == MentuType.PON && f.pai[0] == id) {
 				int[] pai = { id, id, id, id };
-				fuuro.set(i, new Mentu(MentuType.MINKAN, pai));
+				System.out.println(fuuro.set(i, new Mentu(MentuType.MINKAN, pai)));
 				break;
 			}
 		}
@@ -97,7 +97,7 @@ public class Player {
 	}
 
 	void ankan(int id) {
-		// System.out.println(this.name+"：カン！("+t+")");
+//		System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id] -= 4;
 		tehai.remove(tehai.indexOf(new Tile(id)));
 		tehai.remove(tehai.indexOf(new Tile(id)));
@@ -111,7 +111,7 @@ public class Player {
 	}
 
 	void pon(int id) {
-		// System.out.println(this.name+"：ポン！("+t+")");
+//		System.out.println(this.name+"：ポン！("+new Tile(id)+")");
 		te[id] -= 2;
 		tehai.remove(tehai.indexOf(new Tile(id)));
 		tehai.remove(tehai.indexOf(new Tile(id)));
@@ -123,7 +123,7 @@ public class Player {
 	}
 
 	void chii0(int id) {
-		// System.out.println(this.name+"：チー！("+t+")");
+//		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id - 2]--;
 		te[id - 1]--;
 		tehai.remove(tehai.indexOf(new Tile(id - 2)));
@@ -136,7 +136,7 @@ public class Player {
 	}
 
 	void chii1(int id) {
-		// System.out.println(this.name+"：チー！("+t+")");
+//		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id - 1]--;
 		te[id + 1]--;
 		tehai.remove(tehai.indexOf(new Tile(id - 1)));
@@ -149,7 +149,7 @@ public class Player {
 	}
 
 	void chii2(int id) {
-		// System.out.println(this.name+"：チー！("+t+")");
+//		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id + 1]--;
 		te[id + 2]--;
 		tehai.remove(tehai.indexOf(new Tile(id + 1)));

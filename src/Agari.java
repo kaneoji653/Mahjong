@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Agari {
-	final static int[] yao9 = { 0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33 };
-
 	public boolean isYao9(int id) {
 		return !(1 <= id && id <= 7 || 10 <= id && id <= 16 || 19 <= id && id <= 25);
 	}
@@ -17,21 +15,23 @@ class Agari {
 
 	Player p;
 	int head;
-	Mentu[] mentu = new Mentu[4];
+	Mentu[] mentu;
 	MatiType mati;
 	boolean isTumo;
 	int num_dora = 0;
 
-	boolean isChitoi = false;
+	boolean isChitoi;
 	int[] chitoiPair = new int[7];
-	boolean isKokushi = false;
+	boolean isKokushi;
 
-	Agari(Player p, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Tile> dorahyouList) {
+	Agari(Player p, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Tile> dorahyouList, boolean isChitoi, boolean isKokushi) {
 		this.p = p;
 		this.head = head;
 		this.mentu = mentu;
 		this.mati = mati;
 		this.isTumo = isTumo;
+		this.isChitoi=isChitoi;
+		this.isKokushi=isKokushi;
 		this.makeYaku();
 		countDora(dorahyouList);
 		this.printYaku();
@@ -59,44 +59,56 @@ class Agari {
 		int cnt_souzu = 0;
 		int cnt_jihai = 0;
 		int cnt_19 = 0;
-		int[] te = new int[34];
 
-		te[head] += 2;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < mentu[i].pai.length; j++) {
-				int pai = mentu[i].pai[j];
-				te[pai]++;
-				if (pai == 0 || pai == 8 || pai == 9 || pai == 17 || pai == 18 || pai == 26) {
-					cnt_19++;
-				}
-				switch (pai / 9) {
-				case 0:
-					cnt_manzu++;
-					break;
-				case 1:
-					cnt_pinzu++;
-					break;
-				case 2:
-					cnt_souzu++;
-					break;
-				case 3:
-					cnt_jihai++;
-					break;
+		if(isChitoi){
+			for(int i=0;i<34;i++){
+				if(p.te[i]==2){
+					if (i==0||i==8||i==9||i==17||i==18||i==26) cnt_19++;
+					switch (i/9) {
+					case 0:cnt_manzu+=2;break;
+					case 1:cnt_pinzu+=2;break;
+					case 2:cnt_souzu+=2;break;
+					case 3:cnt_jihai+=2;break;
+					}
 				}
 			}
-			if (mentu[i].type == MentuType.SHUN || mentu[i].type == MentuType.CHI) {
-				shunList.add(Math.min(mentu[i].pai[0], mentu[i].pai[1]));
-			} else {
-				kouList.add(mentu[i].pai[0]);
+		}else{
+			int[] te = new int[34];
+			te[head] += 2;
+			switch (head/9) {
+			case 0:cnt_manzu+=2;break;
+			case 1:cnt_pinzu+=2;break;
+			case 2:cnt_souzu+=2;break;
+			case 3:cnt_jihai+=2;break;
 			}
-			if (mentu[i].type == MentuType.ANKO || mentu[i].type == MentuType.ANKAN) {
-				cnt_anko++;
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < mentu[i].pai.length; j++) {
+					int pai = mentu[i].pai[j];
+					te[pai]++;
+					if (pai == 0 || pai == 8 || pai == 9 || pai == 17 || pai == 18 || pai == 26) {
+						cnt_19++;
+					}
+					switch (pai/9) {
+					case 0:cnt_manzu++;break;
+					case 1:cnt_pinzu++;break;
+					case 2:cnt_souzu++;break;
+					case 3:cnt_jihai++;break;
+					}
+				}
+				if (mentu[i].type == MentuType.SHUN || mentu[i].type == MentuType.CHI) {
+					shunList.add(Math.min(mentu[i].pai[0], mentu[i].pai[1]));
+				} else {
+					kouList.add(mentu[i].pai[0]);
+				}
+				if (mentu[i].type == MentuType.ANKO || mentu[i].type == MentuType.ANKAN) {
+					cnt_anko++;
+				}
+				if (mentu[i].type == MentuType.ANKAN || mentu[i].type == MentuType.MINKAN) {
+					cnt_kan++;
+				}
 			}
-			if (mentu[i].type == MentuType.ANKAN || mentu[i].type == MentuType.MINKAN) {
-				cnt_kan++;
-			}
+			p.te = te;
 		}
-		p.te = te;
 
 		yaku[0] = p.isReach;
 		yaku[1] = p.isDoubleReach;
@@ -115,63 +127,66 @@ class Agari {
 		yaku[11] = kouList.contains(32);
 		yaku[12] = kouList.contains(33);
 		yaku[13] = cnt_19 + cnt_jihai == 0;
-		yaku[14] = p.isMenzen && mati == MatiType.RYAMMEN && head != p.jikaze && head != p.bakaze && head != 31
-				&& head != 32 && head != 33 && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
-				&& mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN;
-		yaku[15] = p.isMenzen && (mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
-				&& mentu[0].pai[0] == mentu[1].pai[0]
-				|| mentu[1].type == MentuType.SHUN && mentu[2].type == MentuType.SHUN
-						&& mentu[1].pai[0] == mentu[2].pai[0]
-				|| mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN
-						&& mentu[2].pai[0] == mentu[3].pai[0]);
-		for (int i = 0; i <= 6; i++) {
-			if (shunList.contains(i) && shunList.contains(i + 9) && shunList.contains(i + 18)) {
-				if (p.isMenzen) {
-					yaku[16] = true;
-				} else {
-					yaku[17] = true;
-				}
-			}
-		}
-		for (int i = 0; i < 9; i++) {
-			if (kouList.contains(i) && kouList.contains(i + 9) && kouList.contains(i + 18)) {
-				yaku[18] = true;
-			}
-		}
-		yaku[19] = cnt_anko == 3;
-		if (shunList.contains(0) && shunList.contains(3) && shunList.contains(6)
-				|| shunList.contains(9) && shunList.contains(12) && shunList.contains(15)
-				|| shunList.contains(18) && shunList.contains(21) && shunList.contains(24)) {
-			if (p.isMenzen) {
-				yaku[20] = true;
-			} else {
-				yaku[21] = true;
-			}
-		}
 		yaku[22] = isChitoi;
-		yaku[23] = kouList.size() == 4;
-		if (isYao9(head) && (isYao9(mentu[0].pai[0]) || isYao9(mentu[0].pai[1]) || isYao9(mentu[0].pai[2]))
-				&& (isYao9(mentu[1].pai[0]) || isYao9(mentu[1].pai[1]) || isYao9(mentu[1].pai[2]))
-				&& (isYao9(mentu[2].pai[0]) || isYao9(mentu[2].pai[1]) || isYao9(mentu[2].pai[2]))
-				&& (isYao9(mentu[3].pai[0]) || isYao9(mentu[3].pai[1]) || isYao9(mentu[3].pai[2]))) {
-			if (cnt_jihai != 0) {
-				if (p.isMenzen) {
-					yaku[24] = true;
-				} else {
-					yaku[25] = true;
-				}
-			} else {
-				if (p.isMenzen) {
-					yaku[28] = true;
-				} else {
-					yaku[29] = true;
+		if(!isChitoi){
+			yaku[14] = p.isMenzen && mati == MatiType.RYAMMEN && head != p.jikaze && head != p.bakaze && head != 31
+					&& head != 32 && head != 33 && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
+					&& mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN;
+			yaku[15] = p.isMenzen && (mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
+					&& mentu[0].pai[0] == mentu[1].pai[0]
+					|| mentu[1].type == MentuType.SHUN && mentu[2].type == MentuType.SHUN
+							&& mentu[1].pai[0] == mentu[2].pai[0]
+					|| mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN
+							&& mentu[2].pai[0] == mentu[3].pai[0]);
+			for (int i = 0; i <= 6; i++) {
+				if (shunList.contains(i) && shunList.contains(i + 9) && shunList.contains(i + 18)) {
+					if (p.isMenzen) {
+						yaku[16] = true;
+					} else {
+						yaku[17] = true;
+					}
 				}
 			}
+			for (int i = 0; i < 9; i++) {
+				if (kouList.contains(i) && kouList.contains(i + 9) && kouList.contains(i + 18)) {
+					yaku[18] = true;
+				}
+			}
+			yaku[19] = cnt_anko == 3;
+			if (shunList.contains(0) && shunList.contains(3) && shunList.contains(6)
+					|| shunList.contains(9) && shunList.contains(12) && shunList.contains(15)
+					|| shunList.contains(18) && shunList.contains(21) && shunList.contains(24)) {
+				if (p.isMenzen) {
+					yaku[20] = true;
+				} else {
+					yaku[21] = true;
+				}
+			}
+			yaku[23] = kouList.size() == 4;
+			if (isYao9(head) && (isYao9(mentu[0].pai[0]) || isYao9(mentu[0].pai[1]) || isYao9(mentu[0].pai[2]))
+					&& (isYao9(mentu[1].pai[0]) || isYao9(mentu[1].pai[1]) || isYao9(mentu[1].pai[2]))
+					&& (isYao9(mentu[2].pai[0]) || isYao9(mentu[2].pai[1]) || isYao9(mentu[2].pai[2]))
+					&& (isYao9(mentu[3].pai[0]) || isYao9(mentu[3].pai[1]) || isYao9(mentu[3].pai[2]))) {
+				if (cnt_jihai != 0) {
+					if (p.isMenzen) {
+						yaku[24] = true;
+					} else {
+						yaku[25] = true;
+					}
+				} else {
+					if (p.isMenzen) {
+						yaku[28] = true;
+					} else {
+						yaku[29] = true;
+					}
+				}
+			}
+			yaku[26] = cnt_kan == 3;
+			yaku[27] = p.isMenzen && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
+					&& mentu[0].pai[0] == mentu[1].pai[0] && mentu[2].type == MentuType.SHUN
+					&& mentu[3].type == MentuType.SHUN && mentu[2].pai[0] == mentu[3].pai[0];
 		}
-		yaku[26] = cnt_kan == 3;
-		yaku[27] = p.isMenzen && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
-				&& mentu[0].pai[0] == mentu[1].pai[0] && mentu[2].type == MentuType.SHUN
-				&& mentu[3].type == MentuType.SHUN && mentu[2].pai[0] == mentu[3].pai[0];
+
 		if (cnt_manzu == 0 && cnt_pinzu == 0 && cnt_souzu != 0 || cnt_manzu == 0 && cnt_pinzu != 0 && cnt_souzu == 0
 				|| cnt_manzu != 0 && cnt_pinzu == 0 && cnt_souzu == 0) {
 			if (cnt_jihai != 0) {
@@ -193,7 +208,7 @@ class Agari {
 				|| head == 33 && kouList.contains(31) && kouList.contains(32)) {
 			yaku[32] = true;
 		}
-		yaku[33] = yaku[23] && (yaku[24] || yaku[25]);
+		yaku[33] = (yaku[23] && (yaku[24] || yaku[25])) || (isChitoi && cnt_19+cnt_jihai==14);
 		if (yaku[33]) {
 			yaku[24] = yaku[25] = false;
 		}
