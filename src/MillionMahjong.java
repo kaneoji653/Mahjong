@@ -14,8 +14,8 @@ public class MillionMahjong {
 	public static void kyokuStart() {
 		// プレイヤーの生成
 		Player[] player = new Player[4];
-		for (int i = 0; i < 4; i++) {
-			player[i] = new Player("P" + (i + 1));
+		for (int i=0;i<4;i++) {
+			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
 
 		// 牌山の生成
@@ -67,9 +67,9 @@ public class MillionMahjong {
 			if (p.shanten == -1) {
 				if (p.ai.tsumoSelect()) {
 					System.out.println(p + ":ツモ！(" + tumohai + ")");
-					if (yama.isEmpty()) {
-						p.isHaitei = true;
-					}
+					if (yama.isEmpty()) p.isHaitei = true;
+					
+
 					if (p.isReach) {
 						for (int i = 0; i < total_kan + 1; i++) {
 							dorahyouList.add(wanpai.remove(0));

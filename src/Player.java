@@ -10,8 +10,8 @@ public class Player {
 	int num_kan = 0;
 	int shanten;
 
-	int jikaze = 30;// 未
-	int bakaze = 27;// 未
+	int jikaze;
+	int bakaze;
 	boolean isReach = false;
 	boolean isDoubleReach = false;
 	boolean isIppatu = false;
@@ -24,8 +24,9 @@ public class Player {
 	String name;
 	PlayerAI ai;
 
-	Player(String name) {
+	Player(String name, int bakaze,int jikaze) {
 		this.name = name;
+		this.jikaze=jikaze;
 		ai = new PlayerAI();
 	}
 
