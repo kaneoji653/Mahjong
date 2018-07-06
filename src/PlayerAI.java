@@ -1,49 +1,50 @@
 
 public class PlayerAI {
-	boolean kakanSelect(Tile t){
-//		return true;
+	boolean kakanSelect(Tile t) {
+		// return true;
 		return false;
 	}
 
-	boolean minkanSelect(Tile t){
-//		return true;
+	boolean minkanSelect(Tile t) {
+		// return true;
 		return false;
 
 	}
 
-	boolean ankanSelect(Tile t){
+	boolean ankanSelect(Tile t) {
 		return true;
 	}
 
-	boolean ponSelect(Tile t){
-//		return true;
+	boolean ponSelect(Tile t) {
+		return true;
+		// return false;
+	}
+
+	boolean chii0Select(Tile t) {
+		// return true;
 		return false;
 	}
 
-	boolean chii0Select(Tile t){
-//		return true;
+	boolean chii1Select(Tile t) {
+		// return true;
 		return false;
 	}
 
-	boolean chii1Select(Tile t){
-//		return true;
-		return false;
-	}
-
-	boolean chii2Select(Tile t){
-//		return true;
+	boolean chii2Select(Tile t) {
+		// return true;
 		return false;
 
 	}
 
-	boolean reachSelect(){
+	boolean reachSelect() {
 		return true;
 	}
 
-	boolean tsumoSelect(){
+	boolean tsumoSelect() {
 		return true;
 	}
-	boolean ronSelect(){
+
+	boolean ronSelect() {
 		return true;
 	}
 
