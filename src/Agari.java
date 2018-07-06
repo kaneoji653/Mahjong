@@ -19,6 +19,7 @@ class Agari {
 	MatiType mati;
 	boolean isTumo;
 	int num_dora = 0;
+	int fu;
 
 	boolean isChitoi;
 	int[] chitoiPair = new int[7];
@@ -34,6 +35,7 @@ class Agari {
 		this.isKokushi=isKokushi;
 		this.makeYaku();
 		countDora(dorahyouList);
+		countFu();
 		this.printYaku();
 	}
 
@@ -48,7 +50,27 @@ class Agari {
 		str += mati.toString();
 		return str;
 	}
-
+	
+	void countFu(){
+		if(isChitoi) {
+			this.fu=25;
+			return;
+		}
+		int fu=20;
+		if(head==p.bakaze||head==p.jikaze||head==31||head==32||head==33) fu+=2;
+		if(mati==MatiType.KANCHAN||mati==MatiType.PENCHAN||mati==MatiType.TANKI)fu+=2;
+		if(isTumo) fu+=2;
+		if(p.isMenzen&&!isTumo) fu+=10;
+		for(Mentu m:mentu){
+			if(m.type==MentuType.ANKAN) fu+=(isYao9(m.pai[0]))?32:16;
+			if(m.type==MentuType.MINKAN) fu+=(isYao9(m.pai[0]))?16:8;
+			if(m.type==MentuType.ANKO) fu+=(isYao9(m.pai[0]))?8:4;
+			if(m.type==MentuType.PON) fu+=(isYao9(m.pai[0]))?4:2;
+		}
+		while(fu%10!=0) fu+=2;
+		this.fu=fu;
+	}
+	
 	void makeYaku() {
 		List<Integer> shunList = new ArrayList<>();
 		List<Integer> kouList = new ArrayList<>();
@@ -253,6 +275,6 @@ class Agari {
 		if (num_dora >= 1) {
 			System.out.println("ドラ" + num_dora);
 		}
-		System.out.println(han + "翻");
+		System.out.println(this.fu + "符" + han + "翻");
 	}
 }
