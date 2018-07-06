@@ -1,13 +1,13 @@
 
 public class PlayerAI {
 	boolean kakanSelect(Tile t) {
-		// return true;
-		return false;
+		return true;
+		// return false;
 	}
 
 	boolean minkanSelect(Tile t) {
-		// return true;
-		return false;
+		return true;
+		// return false;
 
 	}
 

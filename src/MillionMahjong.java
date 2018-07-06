@@ -52,14 +52,25 @@ public class MillionMahjong {
 		int ban = 0;
 		Tile tumohai = yama.remove(0);
 		player[ban].tumo(tumohai);
+		boolean isFirstTurn = true;
 
 		dahaiWait: while (true) {
 			Player p = player[ban];
+			if (isFirstTurn) {
+				// 九種チェック
+
+				if (!p.sutehai.isEmpty()) {
+					isFirstTurn = false;
+				}
+			}
 
 			// ツモあがりする？
 			if (p.shanten == -1) {
 				if (p.ai.tsumoSelect()) {
 					System.out.println(p + ":ツモ！(" + tumohai + ")");
+					if (yama.isEmpty()) {
+						p.isHaitei = true;
+					}
 					if (p.isReach) {
 						for (int i = 0; i < total_kan + 1; i++) {
 							dorahyouList.add(wanpai.remove(0));
@@ -70,6 +81,7 @@ public class MillionMahjong {
 					break dahaiWait;
 				}
 			}
+			p.isRinshan = false;
 
 			if (!yama.isEmpty()) {
 				// 暗カンする？
@@ -78,9 +90,11 @@ public class MillionMahjong {
 						if (p.ai.ankanSelect(new Tile(i))) {
 							p.ankan(new Tile(i));
 							total_kan++;
+							isFirstTurn = false;
 							dorahyouList.add(wanpai.remove(0));
 							tumohai = yama.remove(0);// とりあえず山の上から引く。
 							player[ban].tumo(tumohai);
+							p.isRinshan = true;
 							continue dahaiWait;
 						}
 					}
@@ -99,6 +113,7 @@ public class MillionMahjong {
 								if (ro.shanten == 0 && !ro.sutehai.contains(t) && ronCheck(ro, t)) {
 									if (ro.ai.ronSelect()) {
 										houra = (ban + j) % 4;
+										ro.isChankan = true;
 										System.out.println(ro + ":チャンカンロン！(" + t + ") 放銃：" + p);
 										ro.tehai.add(t);
 										ro.te[t.id]++;
@@ -107,10 +122,7 @@ public class MillionMahjong {
 												dorahyouList.add(wanpai.remove(0));
 											}
 										}
-
 										Util.agariEnum(ro, t.id, false, dorahyouList);
-
-										tyankanFlg = true;
 										break dahaiWait;
 									}
 								}
@@ -118,6 +130,7 @@ public class MillionMahjong {
 
 							tumohai = yama.remove(0);// とりあえず山の上から引く。
 							player[ban].tumo(tumohai);
+							p.isRinshan = true;
 							continue dahaiWait;
 						}
 					}
@@ -131,6 +144,7 @@ public class MillionMahjong {
 			if (!p.isReach && yama.size() >= 4 && p.shanten == 0 && p.isMenzen) {
 				if (p.ai.reachSelect()) {
 					p.isReach = true;
+					p.isDoubleReach = isFirstTurn;
 					System.out.println(p + ":リーチ！");
 				}
 			}
@@ -140,6 +154,9 @@ public class MillionMahjong {
 				Player ro = player[(ban + i) % 4];
 				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da)) {
 					if (ro.ai.ronSelect()) {
+						if (yama.isEmpty()) {
+							ro.isHoutei = true;
+						}
 						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
 						ro.tehai.add(da);
 						ro.te[da.id]++;
@@ -172,10 +189,12 @@ public class MillionMahjong {
 					if (tg.te[da.id] == 3) {
 						if (tg.ai.minkanSelect(da)) {
 							tg.minkan(da);
+							isFirstTurn = false;
 							ban = (ban + i) % 4;
 
 							tumohai = yama.remove(0);// とりあえず山の上から引くことにしてる。
 							player[ban].tumo(tumohai);
+							tg.isRinshan = true;
 							continue dahaiWait;
 						}
 					}
@@ -190,6 +209,7 @@ public class MillionMahjong {
 					if (tg.te[da.id] >= 2) {
 						if (tg.ai.ponSelect(da)) {
 							tg.pon(da);
+							isFirstTurn = false;
 							ban = (ban + i) % 4;
 							continue dahaiWait;
 						}
@@ -204,6 +224,7 @@ public class MillionMahjong {
 							&& tg.te[da.id - 1] >= 1) {
 						if (tg.ai.chii0Select(da)) {
 							tg.chii0(da);
+							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
 						}
@@ -213,6 +234,7 @@ public class MillionMahjong {
 							&& tg.te[da.id + 1] >= 1) {
 						if (tg.ai.chii1Select(da)) {
 							tg.chii1(da);
+							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
 						}
@@ -222,6 +244,7 @@ public class MillionMahjong {
 							&& tg.te[da.id + 2] >= 1) {
 						if (tg.ai.chii2Select(da)) {
 							tg.chii2(da);
+							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
 						}

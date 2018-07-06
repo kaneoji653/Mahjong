@@ -360,7 +360,7 @@ class Agari {
 	}
 
 	void countDora(List<Tile> dorahyouList) {
-		System.out.println("ドラ表示:" + dorahyouList);
+		// System.out.println("ドラ表示:" + dorahyouList.size());
 		for (Tile t : dorahyouList) {
 			int dora = -1;
 			switch (t.id) {
