@@ -86,8 +86,8 @@ public class MillionMahjong {
 				// 暗カンする？
 				for (int i = 0; i < 34; i++) {
 					if (p.te[i] == 4) {
-						if (p.ai.ankanSelect(new Tile(i))) {
-							p.ankan(new Tile(i));
+						if (p.ai.ankanSelect(i)) {
+							p.ankan(i);
 							total_kan++;
 							isFirstTurn = false;
 							dorahyouList.add(wanpai.remove(0));
@@ -101,27 +101,26 @@ public class MillionMahjong {
 
 				// 加カンする？
 				for (int i = 0; i < p.num_fuuro; i++) {
-					Tile t = p.fuuro.get(i).pai[0];
-					if (p.fuuro.get(i).type == MentuType.PON && p.tehai.contains(t)) {
-						if (p.ai.kakanSelect(t)) {
-							p.kakan(t);
+					int id = p.fuuro.get(i).pai[0];
+					if (p.fuuro.get(i).type == MentuType.PON && p.te[id] == 1) {
+						if (p.ai.kakanSelect(id)) {
+							p.kakan(id);
 
-							// チャンカンチェック
 							for (int j = 1; j <= 3; j++) {
 								Player ro = player[(ban + j) % 4];
-								if (ro.shanten == 0 && !ro.sutehai.contains(t) && ronCheck(ro, t)) {
+								if (ro.shanten == 0 && !ro.sutehai.contains(new Tile(id)) && ronCheck(ro, id)) {
 									if (ro.ai.ronSelect()) {
 										houra = (ban + j) % 4;
 										ro.isChankan = true;
-										System.out.println(ro + ":チャンカンロン！(" + t + ") 放銃：" + p);
-										ro.tehai.add(t);
-										ro.te[t.id]++;
+										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p);
+										ro.tehai.add(new Tile(id));
+										ro.te[id]++;
 										if (ro.isReach) {
 											for (int a = 0; a < total_kan + 1; a++) {
 												dorahyouList.add(wanpai.remove(0));
 											}
 										}
-										Util.agariEnum(ro, t.id, false, dorahyouList);
+										Util.agariEnum(ro, id, false, dorahyouList);
 										break dahaiWait;
 									}
 								}
@@ -151,7 +150,7 @@ public class MillionMahjong {
 			// ロンする？
 			for (int i = 1; i <= 3; i++) {
 				Player ro = player[(ban + i) % 4];
-				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da)) {
+				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da.id)) {
 					if (ro.ai.ronSelect()) {
 						if (yama.isEmpty()) {
 							ro.isHoutei = true;
@@ -186,8 +185,8 @@ public class MillionMahjong {
 						continue;
 					}
 					if (tg.te[da.id] == 3) {
-						if (tg.ai.minkanSelect(da)) {
-							tg.minkan(da);
+						if (tg.ai.minkanSelect(da.id)) {
+							tg.minkan(da.id);
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
 
@@ -206,8 +205,8 @@ public class MillionMahjong {
 						continue;
 					}
 					if (tg.te[da.id] >= 2) {
-						if (tg.ai.ponSelect(da)) {
-							tg.pon(da);
+						if (tg.ai.ponSelect(da.id)) {
+							tg.pon(da.id);
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
 							continue dahaiWait;
@@ -221,8 +220,8 @@ public class MillionMahjong {
 					// チー0する？
 					if (!da.shu.equals("z") && da.kazu != 1 && da.kazu != 2 && tg.te[da.id - 2] >= 1
 							&& tg.te[da.id - 1] >= 1) {
-						if (tg.ai.chii0Select(da)) {
-							tg.chii0(da);
+						if (tg.ai.chii0Select(da.id)) {
+							tg.chii0(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
@@ -231,8 +230,8 @@ public class MillionMahjong {
 					// チー1する？
 					if (!da.shu.equals("z") && da.kazu != 1 && da.kazu != 9 && tg.te[da.id - 1] >= 1
 							&& tg.te[da.id + 1] >= 1) {
-						if (tg.ai.chii1Select(da)) {
-							tg.chii1(da);
+						if (tg.ai.chii1Select(da.id)) {
+							tg.chii1(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
@@ -241,8 +240,8 @@ public class MillionMahjong {
 					// チー2する？
 					if (!da.shu.equals("z") && da.kazu != 8 && da.kazu != 9 && tg.te[da.id + 1] >= 1
 							&& tg.te[da.id + 2] >= 1) {
-						if (tg.ai.chii2Select(da)) {
-							tg.chii2(da);
+						if (tg.ai.chii2Select(da.id)) {
+							tg.chii2(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							continue dahaiWait;
@@ -270,12 +269,12 @@ public class MillionMahjong {
 		System.out.println("-----------------------");
 	}
 
-	static boolean ronCheck(Player p, Tile t) {
-		p.tehai.add(t);
-		p.te[t.id]++;
+	static boolean ronCheck(Player p, int id) {
+		p.tehai.add(new Tile(id));
+		p.te[id]++;
 		boolean canRon = shanten(p) == -1;
 		p.tehai.remove(p.tehai.size() - 1);
-		p.te[t.id]--;
+		p.te[id]--;
 		return canRon;
 	}
 

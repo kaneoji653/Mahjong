@@ -1,36 +1,36 @@
 
 public class PlayerAI {
-	boolean kakanSelect(Tile t) {
+	boolean kakanSelect(int id) {
 		return true;
 		// return false;
 	}
 
-	boolean minkanSelect(Tile t) {
+	boolean minkanSelect(int id) {
 		return true;
 		// return false;
 
 	}
 
-	boolean ankanSelect(Tile t) {
+	boolean ankanSelect(int id) {
 		return true;
 	}
 
-	boolean ponSelect(Tile t) {
+	boolean ponSelect(int id) {
 		return true;
 		// return false;
 	}
 
-	boolean chii0Select(Tile t) {
+	boolean chii0Select(int id) {
 		// return true;
 		return false;
 	}
 
-	boolean chii1Select(Tile t) {
+	boolean chii1Select(int id) {
 		// return true;
 		return false;
 	}
 
-	boolean chii2Select(Tile t) {
+	boolean chii2Select(int id) {
 		// return true;
 		return false;
 

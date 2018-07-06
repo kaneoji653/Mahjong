@@ -1,29 +1,31 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Util {
 
 	public static List<Agari> agariEnum(Player player, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
 		player.printTehai();
-		int[] te = player.te;
+		// int[] te = player.te;
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
 		List<Integer> headKouho = new ArrayList<>();
 		for (int i = 0; i < 34; i++) {
-			if (te[i] >= 2) {
+			if (player.te[i] >= 2) {
 				headKouho.add(i);
 			}
 		}
 		for (Integer head : headKouho) {
+			int[] te = Arrays.copyOf(player.te, player.te.length);
+			te[head] -= 2;
+
 			List<MatiType> matiKouho = new ArrayList<>();
 			if (agarihai == head) {
 				matiKouho.add(MatiType.TANKI);
 			}
 			boolean isPinfu = player.num_fuuro == 0
 					&& !(head == player.bakaze || head == player.jikaze || head == 31 || head == 32 || head == 33);
-
-			te[head] -= 2;
 
 			// 面子分解(前から見る。3枚あるなら暗刻として除去、1枚あるなら順子として除去(できないなら終了))
 			Mentu[] mentu4 = new Mentu[4];
@@ -68,14 +70,8 @@ public class Util {
 
 			// 4面子取れたら、待ちごとにAgariインスタンス生成
 			if (m_cnt + player.num_fuuro == 4) {
-				// フーロを変換（Tile→intは無駄？）
 				for (int i = 0; i < player.num_fuuro; i++) {
-					Tile[] ttt = player.fuuro.get(i).pai;
-					int[] pai = new int[ttt.length];
-					for (int j = 0; j < pai.length; j++) {
-						pai[j] = ttt[j].id;
-					}
-					mentu4[3 - i] = new Mentu(player.fuuro.get(i).type, pai);
+					mentu4[3 - i] = player.fuuro.get(i);
 				}
 
 				// 待ち限定
@@ -107,14 +103,6 @@ public class Util {
 				// あがり生成
 				agari.add(new Agari(player, head, mentu4, mati, isTumo, dorahyouList));
 			}
-
-			// 手牌を戻す
-			te[head] += 2;
-			for (int i = 0; i < m_cnt; i++) {
-				te[mentu4[i].pai[0]]++;
-				te[mentu4[i].pai[1]]++;
-				te[mentu4[i].pai[2]]++;
-			}
 		}
 
 		// あがり候補のスコアを計算して、最大値をとる。(未)
@@ -136,26 +124,22 @@ enum MentuType {
 class Mentu {
 	MentuType type;
 	int[] pai;
+	String shu;
 
 	Mentu(MentuType type, int[] pai) {
 		this.type = type;
 		this.pai = pai;
+		this.shu = new Tile(pai[0]).shu;
 	}
 
 	@Override
 	public String toString() {
 		if (type == MentuType.PON || type == MentuType.CHI || type == MentuType.MINKAN) {
-			return "(" + pai[0] + "," + pai[1] + "," + pai[2] + (type == MentuType.MINKAN ? "," + pai[3] : "") + ")";
+			return "(" + (pai[0] / 9 + 1) + (pai[1] / 9 + 1) + (pai[2] / 9 + 1)
+					+ (type == MentuType.MINKAN ? pai[3] / 9 + 1 : "") + shu + ")";
 		} else {
-			return "[" + pai[0] + "," + pai[1] + "," + pai[2] + (type == MentuType.ANKAN ? "," + pai[3] : "") + "]";
-		}
-	}
-
-	boolean contains(int t) {
-		if (pai[0] == t || pai[1] == t || pai[2] == t) {
-			return true;
-		} else {
-			return false;
+			return "[" + (pai[0] / 9 + 1) + (pai[1] / 9 + 1) + (pai[2] / 9 + 1)
+					+ (type == MentuType.MINKAN ? pai[3] / 9 + 1 : "") + shu + "]";
 		}
 	}
 }

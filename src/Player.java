@@ -5,7 +5,7 @@ public class Player {
 	int[] te = new int[34];
 	List<Tile> tehai = new ArrayList<>();
 	List<Tile> sutehai = new ArrayList<>();
-	List<Fuuro> fuuro = new ArrayList<>();
+	List<Mentu> fuuro = new ArrayList<>();
 	int num_fuuro = 0;
 	int num_kan = 0;
 	int shanten;
@@ -13,12 +13,12 @@ public class Player {
 	int jikaze = 30;// 未
 	int bakaze = 27;// 未
 	boolean isReach = false;
-	boolean isDoubleReach = false; // 未実装
-	boolean isIppatu = false; // 未実装
-	boolean isHaitei = false; // 未実装
-	boolean isHoutei = false; // 未実装
-	boolean isRinshan = false; // 未実装
-	boolean isChankan = false; // 未実装
+	boolean isDoubleReach = false;
+	boolean isIppatu = false;
+	boolean isHaitei = false;
+	boolean isHoutei = false;
+	boolean isRinshan = false;
+	boolean isChankan = false;
 
 	boolean isMenzen = true;
 	String name;
@@ -27,36 +27,6 @@ public class Player {
 	Player(String name) {
 		this.name = name;
 		ai = new PlayerAI();
-	}
-
-	class Fuuro {
-		MentuType type;
-		Tile[] pai;
-
-		Fuuro(MentuType type) {
-			this.type = type;
-			switch (type) {
-			case MINKAN:
-				this.pai = new Tile[4];
-				break;
-			case ANKAN:
-				this.pai = new Tile[4];
-				break;
-			default:
-				this.pai = new Tile[3];
-				break;
-			}
-		}
-
-		@Override
-		public String toString() {
-			String str = this.type == MentuType.ANKAN ? "[" : "(";
-			for (int i = 0; i < pai.length; i++) {
-				str += pai[i].kazu;
-			}
-			str += pai[0].shu + (this.type == MentuType.ANKAN ? "]" : ")");
-			return str;
-		}
 	}
 
 	// 一枚ツモる
@@ -94,100 +64,98 @@ public class Player {
 		return dahaiKouho.get((int) (Math.random() * dahaiKouho.size()));
 	}
 
-	void minkan(Tile t) {
-		num_kan++;
+	void minkan(int id) {
 		// System.out.println(this.name+"：カン！("+t+")");
-		te[t.id] -= 3;
-		Fuuro f = new Fuuro(MentuType.MINKAN);
-		f.pai[0] = t;
-		f.pai[1] = tehai.remove(tehai.indexOf(t));
-		f.pai[2] = tehai.remove(tehai.indexOf(t));
-		f.pai[3] = tehai.remove(tehai.indexOf(t));
-		fuuro.add(f);
+		te[id] -= 3;
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+
+		int[] pai = { id, id, id, id };
+		fuuro.add(new Mentu(MentuType.MINKAN, pai));
 		num_fuuro++;
+		num_kan++;
 		isMenzen = false;
 	}
 
-	void kakan(Tile t) {
-		num_kan++;
+	void kakan(int id) {
 		// System.out.println(this.name+"：カン！("+t+")");
-		Fuuro f = null;
+		te[id]--;
+		tehai.remove(tehai.indexOf(new Tile(id)));
+
+		Mentu f = null;
 		for (int i = 0; i < num_fuuro; i++) {
 			f = fuuro.get(i);
-			if (f.type == MentuType.PON && f.pai[0].equals(t)) {
+			if (f.type == MentuType.PON && f.pai[0] == id) {
+				int[] pai = { id, id, id, id };
+				fuuro.set(i, new Mentu(MentuType.MINKAN, pai));
 				break;
 			}
 		}
-		f.type = MentuType.MINKAN;
-		te[t.id]--;
-		Tile[] kan = new Tile[4];
-		kan[0] = f.pai[0];
-		kan[1] = f.pai[1];
-		kan[2] = f.pai[2];
-		kan[3] = tehai.remove(tehai.indexOf(t));
-		f.pai = kan;
-	}
-
-	void ankan(Tile t) {
 		num_kan++;
+	}
+
+	void ankan(int id) {
 		// System.out.println(this.name+"：カン！("+t+")");
-		te[t.id] -= 4;
-		Fuuro f = new Fuuro(MentuType.ANKAN);
-		f.pai[0] = tehai.remove(tehai.indexOf(t));
-		f.pai[1] = tehai.remove(tehai.indexOf(t));
-		f.pai[2] = tehai.remove(tehai.indexOf(t));
-		f.pai[3] = tehai.remove(tehai.indexOf(t));
-		fuuro.add(f);
+		te[id] -= 4;
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+
+		int[] pai = { id, id, id, id };
+		fuuro.add(new Mentu(MentuType.ANKAN, pai));
 		num_fuuro++;
+		num_kan++;
 	}
 
-	void pon(Tile t) {
+	void pon(int id) {
 		// System.out.println(this.name+"：ポン！("+t+")");
-		te[t.id] -= 2;
-		Fuuro f = new Fuuro(MentuType.PON);
-		f.pai[0] = t;
-		f.pai[1] = tehai.remove(tehai.indexOf(t));
-		f.pai[2] = tehai.remove(tehai.indexOf(t));
-		fuuro.add(f);
+		te[id] -= 2;
+		tehai.remove(tehai.indexOf(new Tile(id)));
+		tehai.remove(tehai.indexOf(new Tile(id)));
+
+		int[] pai = { id, id, id };
+		fuuro.add(new Mentu(MentuType.PON, pai));
 		num_fuuro++;
 		isMenzen = false;
 	}
 
-	void chii0(Tile t) {
+	void chii0(int id) {
 		// System.out.println(this.name+"：チー！("+t+")");
-		te[t.id - 2]--;
-		te[t.id - 1]--;
-		Fuuro f = new Fuuro(MentuType.CHI);
-		f.pai[0] = t;
-		f.pai[1] = tehai.remove(tehai.indexOf(new Tile(t.id - 2)));
-		f.pai[2] = tehai.remove(tehai.indexOf(new Tile(t.id - 1)));
-		fuuro.add(f);
+		te[id - 2]--;
+		te[id - 1]--;
+		tehai.remove(tehai.indexOf(new Tile(id - 2)));
+		tehai.remove(tehai.indexOf(new Tile(id - 1)));
+
+		int[] pai = { id - 2, id - 1, id };
+		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
 		isMenzen = false;
 	}
 
-	void chii1(Tile t) {
+	void chii1(int id) {
 		// System.out.println(this.name+"：チー！("+t+")");
-		te[t.id - 1]--;
-		te[t.id + 1]--;
-		Fuuro f = new Fuuro(MentuType.CHI);
-		f.pai[0] = t;
-		f.pai[1] = tehai.remove(tehai.indexOf(new Tile(t.id - 1)));
-		f.pai[2] = tehai.remove(tehai.indexOf(new Tile(t.id + 1)));
-		fuuro.add(f);
+		te[id - 1]--;
+		te[id + 1]--;
+		tehai.remove(tehai.indexOf(new Tile(id - 1)));
+		tehai.remove(tehai.indexOf(new Tile(id + 1)));
+
+		int[] pai = { id - 1, id, id + 1 };
+		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
 		isMenzen = false;
 	}
 
-	void chii2(Tile t) {
+	void chii2(int id) {
 		// System.out.println(this.name+"：チー！("+t+")");
-		te[t.id + 1]--;
-		te[t.id + 2]--;
-		Fuuro f = new Fuuro(MentuType.CHI);
-		f.pai[0] = t;
-		f.pai[1] = tehai.remove(tehai.indexOf(new Tile(t.id + 1)));
-		f.pai[2] = tehai.remove(tehai.indexOf(new Tile(t.id + 2)));
-		fuuro.add(f);
+		te[id + 1]--;
+		te[id + 2]--;
+		tehai.remove(tehai.indexOf(new Tile(id + 1)));
+		tehai.remove(tehai.indexOf(new Tile(id + 2)));
+
+		int[] pai = { id, id + 1, id + 2 };
+		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
 		isMenzen = false;
 	}
