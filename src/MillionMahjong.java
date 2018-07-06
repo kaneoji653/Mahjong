@@ -282,7 +282,7 @@ public class MillionMahjong {
 		int[] te = p.te;
 
 		// 普通手のシャンテン
-		int shanten = selectBlock(te, p.num_fuuro, 0, 0);
+		int shanten = selectBlock(te, p.num_fuuro, 0, 0, true);
 
 		// メンゼンならチートイと国士のシャンテン計算
 		if (p.num_fuuro == 0) {
@@ -300,84 +300,19 @@ public class MillionMahjong {
 			// 国士無双のシャンテン
 			int shanten_kokushi = 14;
 			int kokushiHead = 0;
-			if (te[0] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[0] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[8] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[8] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[9] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[9] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[17] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[17] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[18] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[18] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[26] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[26] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[27] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[27] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[28] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[28] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[29] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[29] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[30] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[30] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[31] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[31] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[32] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[32] >= 2) {
-				kokushiHead = 1;
-			}
-			if (te[33] >= 1) {
-				shanten_kokushi--;
-			}
-			if (te[33] >= 2) {
-				kokushiHead = 1;
-			}
+			if (te[0]>=1)shanten_kokushi--; if(te[0]>=2)kokushiHead=1;
+			if (te[8]>=1)shanten_kokushi--; if(te[8]>=2)kokushiHead=1;
+			if (te[9]>=1)shanten_kokushi--; if(te[9]>=2)kokushiHead=1;
+			if (te[17]>=1)shanten_kokushi--; if(te[17]>=2)kokushiHead=1;
+			if (te[18]>=1)shanten_kokushi--; if(te[18]>=2)kokushiHead=1;
+			if (te[26]>=1)shanten_kokushi--; if(te[26]>=2)kokushiHead=1;
+			if (te[27]>=1)shanten_kokushi--; if(te[27]>=2)kokushiHead=1;
+			if (te[28]>=1)shanten_kokushi--; if(te[28]>=2)kokushiHead=1;
+			if (te[29]>=1)shanten_kokushi--; if(te[29]>=2)kokushiHead=1;
+			if (te[30]>=1)shanten_kokushi--; if(te[30]>=2)kokushiHead=1;
+			if (te[31]>=1)shanten_kokushi--; if(te[31]>=2)kokushiHead=1;
+			if (te[32]>=1)shanten_kokushi--; if(te[32]>=2)kokushiHead=1;
+			if (te[33]>=1)shanten_kokushi--; if(te[33]>=2)kokushiHead=1;
 			shanten_kokushi -= kokushiHead;
 
 			// 最小のシャンテン数を返す
@@ -387,7 +322,7 @@ public class MillionMahjong {
 		return shanten;
 	}
 
-	static int selectBlock(int[] te, int men, int ta, int head) {
+	static int selectBlock(int[] te, int men, int ta, int head, boolean flg) {
 		if (men + ta == 4) {
 			return 8 - 2 * men - ta - head;
 		}
@@ -403,32 +338,34 @@ public class MillionMahjong {
 			}
 			for (Integer h : headKouho) {
 				te[h] -= 2;
-				min_shanten = Math.min(min_shanten, selectBlock(te, men, ta, head + 1));
+				min_shanten = Math.min(min_shanten, selectBlock(te, men, ta, head + 1, true));
 				te[h] += 2;
 			}
 		}
 
 		// 面子選択
-		List<int[]> mentuKouho = new ArrayList<>();
-		for (int i = 0; i < 34; i++) {
-			if (te[i] >= 3) {
-				int[] koutu = { i, i, i };
-				mentuKouho.add(koutu);
+		if(flg){
+			List<int[]> mentuKouho = new ArrayList<>();
+			for (int i = 0; i < 34; i++) {
+				if (te[i] >= 3) {
+					int[] koutu = { i, i, i };
+					mentuKouho.add(koutu);
+				}
+				if ((0 <= i && i <= 6 || 9 <= i && i <= 15 || 18 <= i && i <= 24) && te[i] >= 1 && te[i + 1] >= 1
+						&& te[i + 2] >= 1) {
+					int[] shuntu = { i, i + 1, i + 2 };
+					mentuKouho.add(shuntu);
+				}
 			}
-			if ((0 <= i && i <= 6 || 9 <= i && i <= 15 || 18 <= i && i <= 24) && te[i] >= 1 && te[i + 1] >= 1
-					&& te[i + 2] >= 1) {
-				int[] shuntu = { i, i + 1, i + 2 };
-				mentuKouho.add(shuntu);
+			for (int[] m : mentuKouho) {
+				te[m[0]]--;
+				te[m[1]]--;
+				te[m[2]]--;
+				min_shanten = Math.min(min_shanten, selectBlock(te, men + 1, ta, head, true));
+				te[m[0]]++;
+				te[m[1]]++;
+				te[m[2]]++;
 			}
-		}
-		for (int[] m : mentuKouho) {
-			te[m[0]]--;
-			te[m[1]]--;
-			te[m[2]]--;
-			min_shanten = Math.min(min_shanten, selectBlock(te, men + 1, ta, head));
-			te[m[0]]++;
-			te[m[1]]++;
-			te[m[2]]++;
 		}
 
 		// ターツ選択
@@ -453,7 +390,7 @@ public class MillionMahjong {
 		for (int[] t : tatuKouho) {
 			te[t[0]]--;
 			te[t[1]]--;
-			min_shanten = Math.min(min_shanten, selectBlock(te, men, ta + 1, head));
+			min_shanten = Math.min(min_shanten, selectBlock(te, men, ta + 1, head, true));
 			te[t[0]]++;
 			te[t[1]]++;
 		}
