@@ -23,6 +23,7 @@ public class Player {
 	boolean isMenzen = true;
 	String name;
 	PlayerAI ai;
+	int point;
 
 	Player(String name, int bakaze,int jikaze) {
 		this.name = name;

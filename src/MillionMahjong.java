@@ -17,6 +17,7 @@ public class MillionMahjong {
 		for (int i=0;i<4;i++) {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
+		Player oya= player[0];
 
 		// 牌山の生成
 		ArrayList<Tile> yama = new ArrayList<>(136);
@@ -68,14 +69,15 @@ public class MillionMahjong {
 				if (p.ai.tsumoSelect()) {
 					System.out.println(p + ":ツモ！(" + tumohai + ")");
 					if (yama.isEmpty()) p.isHaitei = true;
-					
+
 
 					if (p.isReach) {
 						for (int i = 0; i < total_kan + 1; i++) {
 							dorahyouList.add(wanpai.remove(0));
 						}
 					}
-					Agari.agari(p, tumohai.id, true, dorahyouList);
+					Agari a=Agari.agari(p, tumohai.id, true, dorahyouList);
+					PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==p, true);
 					houra = ban;
 					break dahaiWait;
 				}
@@ -120,7 +122,8 @@ public class MillionMahjong {
 												dorahyouList.add(wanpai.remove(0));
 											}
 										}
-										Agari.agari(ro, id, false, dorahyouList);
+										Agari a=Agari.agari(ro, id, false, dorahyouList);
+										PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==ro, false);
 										break dahaiWait;
 									}
 								}
@@ -163,8 +166,8 @@ public class MillionMahjong {
 								dorahyouList.add(wanpai.remove(0));
 							}
 						}
-						Agari.agari(ro, da.id, false, dorahyouList);
-
+						Agari a=Agari.agari(ro, da.id, false, dorahyouList);
+						PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==ro, false);
 						houra = (ban + i) % 4;
 						break dahaiWait;
 					}

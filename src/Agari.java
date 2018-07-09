@@ -23,6 +23,7 @@ class Agari {
 	boolean isTumo;
 	int num_dora = 0;
 	int fu;
+	int num_yaku;
 
 	boolean isChitoi;
 	int[] chitoiPair = new int[7];
@@ -349,7 +350,13 @@ class Agari {
 		if (yaku[33]) {
 			yaku[24] = yaku[25] = false;
 		}
-
+		
+		num_yaku=0;
+		for (int i=0;i<36;i++) {
+			if (yaku[i]) {
+				num_yaku += yakuHan[i];
+			}
+		}
 	}
 
 	void countDora(List<Tile> dorahyouList) {
@@ -380,13 +387,13 @@ class Agari {
 	}
 
 	void printYaku() {
-		int han = num_dora;
+		int han = num_dora+num_yaku;
 		for (int i = 0; i < 36; i++) {
 			if (yaku[i]) {
-				han += yakuHan[i];
 				System.out.println(yakuMei[i]);
 			}
 		}
+
 		if (num_dora >= 1) {
 			System.out.println("ドラ" + num_dora);
 		}
