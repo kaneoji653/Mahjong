@@ -173,6 +173,7 @@ class Agari {
 			if(m.type==MentuType.ANKO) fu+=(isYao9(m.pai[0]))?8:4;
 			if(m.type==MentuType.PON) fu+=(isYao9(m.pai[0]))?4:2;
 		}
+		if(!houra.isMenzen&&fu==20)fu=30;
 		while(fu%10!=0) fu+=2;
 		this.fu=fu;
 	}
@@ -209,6 +210,7 @@ class Agari {
 			case 2:cnt_souzu+=2;break;
 			case 3:cnt_jihai+=2;break;
 			}
+			if(head==0||head==8||head==9||head==17||head==18||head==26)cnt_19+=2;
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < mentu[i].pai.length; j++) {
 					int pai = mentu[i].pai[j];

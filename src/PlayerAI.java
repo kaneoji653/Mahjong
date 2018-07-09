@@ -1,6 +1,6 @@
 
 public class PlayerAI {
-	boolean naki=true;
+	boolean naki=false;
 	boolean kakanSelect(int id) {
 		return naki;
 	}
