@@ -26,7 +26,7 @@ public class PointManager {
 		List<Player> tempai = new ArrayList<>();
 		List<Player> noten = new ArrayList<>();
 		for(int i=0;i<4;i++){
-			if(players[i].shanten==0){
+			if(MillionMahjong.shanten(players[i])==0){
 				tempai.add(players[i]);
 			}else{
 				noten.add(players[i]);
@@ -74,7 +74,7 @@ public class PointManager {
 			if(agari==oya){
 				return ronOya[fu_id(fu)][han-1];
 			}else{
-				return ronOya[fu_id(fu)][han-1];
+				return ronKo[fu_id(fu)][han-1];
 			}
 		}
 	}

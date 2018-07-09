@@ -23,7 +23,6 @@ public class MillionMahjong {
 	}
 
 	public static void kyokuStart(Player[] player, PointManager pm) {
-		Player oya= player[0];
 
 		// 牌山の生成
 		ArrayList<Tile> yama = new ArrayList<>(136);
@@ -62,7 +61,9 @@ public class MillionMahjong {
 		int ban = 0;
 		Tile tumohai = yama.remove(0);
 		player[ban].tumo(tumohai);
+
 		boolean isFirstTurn = true;
+		boolean isNakiTurn = false;
 
 		dahaiWait: while (true) {
 			Player p = player[ban];
@@ -75,25 +76,27 @@ public class MillionMahjong {
 			}
 
 			// ツモあがりする？
-			if (p.shanten == -1) {
-				if (p.ai.tsumoSelect()) {
-					System.out.println(p + ":ツモ！(" + tumohai + ")");
-					if (yama.isEmpty()) p.isHaitei = true;
+			if (!isNakiTurn && p.shanten==-1){
+//				System.out.println(tumohai);
+				if(Agari.agari(p,null,tumohai.id,true,new ArrayList<>()).han>=1) {
+					if (p.ai.tsumoSelect()) {
+//						System.out.println(p + ":ツモ！(" + tumohai + ")");
+						if (yama.isEmpty()) p.isHaitei = true;
 
 
-					if (p.isReach) {
-						for (int i = 0; i < total_kan + 1; i++) {
-							dorahyouList.add(wanpai.remove(0));
+						if (p.isReach) {
+							for (int i = 0; i < total_kan + 1; i++) {
+								dorahyouList.add(wanpai.remove(0));
+							}
 						}
+						agari=Agari.agari(p,null, tumohai.id, true, dorahyouList);
+						break dahaiWait;
 					}
-					agari=Agari.agari(p,null, tumohai.id, true, dorahyouList);
-					PointManager.printScore(agari.fu, agari.han, oya==p, true);
-					break dahaiWait;
 				}
 			}
 			p.isRinshan = false;
 
-			if (!yama.isEmpty()) {
+			if (!yama.isEmpty() && !isNakiTurn) {
 				// 暗カンする？
 				for (int i = 0; i < 34; i++) {
 					if (p.te[i] == 4) {
@@ -122,7 +125,7 @@ public class MillionMahjong {
 								if (ro.shanten == 0 && !ro.sutehai.contains(new Tile(id)) && ronCheck(ro, id)) {
 									if (ro.ai.ronSelect()) {
 										ro.isChankan = true;
-										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p);
+//										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p);
 										ro.tehai.add(new Tile(id));
 										ro.te[id]++;
 										if (ro.isReach) {
@@ -131,7 +134,6 @@ public class MillionMahjong {
 											}
 										}
 										agari=Agari.agari(ro, p, id, false, dorahyouList);
-										PointManager.printScore(agari.fu, agari.han, oya==ro, false);
 										break dahaiWait;
 									}
 								}
@@ -148,6 +150,7 @@ public class MillionMahjong {
 
 			// 打牌は？？ まだAIに委譲してない
 			Tile da = p.dahai(tumohai);
+			isNakiTurn = false;
 
 			// リーチ宣言する？
 			if (!p.isReach && yama.size() >= 4 && p.shanten == 0 && p.isMenzen) {
@@ -166,7 +169,7 @@ public class MillionMahjong {
 						if (yama.isEmpty()) {
 							ro.isHoutei = true;
 						}
-						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
+//						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
 						ro.tehai.add(da);
 						ro.te[da.id]++;
 						if (ro.isReach) {
@@ -175,7 +178,6 @@ public class MillionMahjong {
 							}
 						}
 						agari=Agari.agari(ro, p, da.id, false, dorahyouList);
-						PointManager.printScore(agari.fu, agari.han, oya==ro, false);
 						break dahaiWait;
 					}
 				}
@@ -219,6 +221,7 @@ public class MillionMahjong {
 							tg.pon(da.id);
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
+							isNakiTurn = true;
 							continue dahaiWait;
 						}
 					}
@@ -234,6 +237,7 @@ public class MillionMahjong {
 							tg.chii0(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
+							isNakiTurn = true;
 							continue dahaiWait;
 						}
 					}
@@ -244,6 +248,7 @@ public class MillionMahjong {
 							tg.chii1(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
+							isNakiTurn = true;
 							continue dahaiWait;
 						}
 					}
@@ -254,6 +259,7 @@ public class MillionMahjong {
 							tg.chii2(da.id);
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
+							isNakiTurn = true;
 							continue dahaiWait;
 						}
 					}
@@ -267,12 +273,14 @@ public class MillionMahjong {
 			ban = (ban+1)%4;
 			tumohai = yama.remove(0);
 			player[ban].tumo(tumohai);
+
 		}
 		////////////////////// 局終了////////////////////////////////////
 		if(agari==null){
 			System.out.println("流局");
 			pm.bappu();
 		}else{
+			agari.print();
 			if(agari.isTumo){
 				pm.tumo(agari.houra, agari.fu, agari.han);
 			}else{
@@ -281,12 +289,13 @@ public class MillionMahjong {
 		}
 	}
 
-	static boolean ronCheck(Player p, int id) {
-		p.tehai.add(new Tile(id));
-		p.te[id]++;
-		boolean canRon = shanten(p) == -1;
-		p.tehai.remove(p.tehai.size() - 1);
-		p.te[id]--;
+	static boolean ronCheck(Player ro, int id) {
+		ro.tehai.add(new Tile(id));
+		ro.te[id]++;
+		boolean canRon = shanten(ro)==-1 && Agari.agari(ro,null,id,false,new ArrayList<>()).han>=1;
+
+		ro.tehai.remove(ro.tehai.size() - 1);
+		ro.te[id]--;
 		return canRon;
 	}
 

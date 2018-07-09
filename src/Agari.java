@@ -48,11 +48,9 @@ class Agari {
 		countDora(dorahyouList);
 		han=num_dora+num_yaku;
 		countFu();
-		this.printYaku();
 	}
 
 	public static Agari agari(Player houra,Player houju, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
-		System.out.println(houra.tehaiToString());
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
@@ -159,12 +157,6 @@ class Agari {
 		return agari.get(0);
 	}
 
-	@Override
-	public String toString() {
-		String str=isTumo?"ツモ":"ロン(放銃:"+houju+") "+this.fu+"符"+this.han+"翻";
-		return str;
-	}
-
 	void countFu(){
 		if(isChitoi) {
 			this.fu=25;
@@ -243,7 +235,7 @@ class Agari {
 					cnt_kan++;
 				}
 			}
-			houra.te = te;
+//			houra.te = te;
 		}
 
 		yaku[0] = houra.isReach;
@@ -358,8 +350,8 @@ class Agari {
 	}
 
 	void countDora(List<Tile> dorahyouList) {
-		System.out.print("ドラ: ");
 		for (Tile t : dorahyouList) {
+			//ドラ表示からドラを計算
 			int dora = -1;
 			switch (t.id) {
 			case 8:  dora = 0; break;
@@ -369,24 +361,33 @@ class Agari {
 			case 33: dora = 31;	break;
 			default: dora = t.id+1;break;
 			}
-			System.out.print(new Tile(dora)+" ");
+
+			//ドラを数える
 			num_dora += houra.te[dora];
+			for(Mentu m:houra.fuuro){
+				for(int p:m.pai){
+					if(p==dora)num_dora++;
+				}
+			}
 		}
-		System.out.println();
-		System.out.println();
+	}
+
+	void print(){
+		System.out.println(houra.name +(isTumo? ":" : "←"+houju+":"));
+		System.out.println(houra.tehaiToString());
+		printYaku();
+		System.out.println(this.fu + "符" + han + "翻");
+		PointManager.printScore(fu,han,houra.jikaze==27,isTumo);
 	}
 
 	void printYaku() {
-		int han = num_dora+num_yaku;
 		for (int i = 0; i < 36; i++) {
 			if (yaku[i]) {
 				System.out.println(yakuMei[i]);
 			}
 		}
-
 		if (num_dora >= 1) {
 			System.out.println("ドラ" + num_dora);
 		}
-		System.out.println(this.fu + "符" + han + "翻");
 	}
 }

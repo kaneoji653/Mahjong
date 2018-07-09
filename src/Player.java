@@ -110,7 +110,7 @@ public class Player {
 			f = fuuro.get(i);
 			if (f.type == MentuType.PON && f.pai[0] == id) {
 				int[] pai = { id, id, id, id };
-				System.out.println(fuuro.set(i, new Mentu(MentuType.MINKAN, pai)));
+				fuuro.set(i, new Mentu(MentuType.MINKAN, pai));
 				break;
 			}
 		}
