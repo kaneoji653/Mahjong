@@ -23,7 +23,25 @@ public class Player {
 	boolean isMenzen = true;
 	String name;
 	PlayerAI ai;
-	int point;
+	int point = 25000;
+
+	void initialize(){
+		te = new int[34];
+		tehai = new ArrayList<>();
+		sutehai = new ArrayList<>();
+		fuuro = new ArrayList<>();
+		num_fuuro = 0;
+		num_kan = 0;
+		shanten=8;
+		isReach = false;
+		isDoubleReach = false;
+		isIppatu = false;
+		isHaitei = false;
+		isHoutei = false;
+		isRinshan = false;
+		isChankan = false;
+		isMenzen = true;
+	}
 
 	Player(String name, int bakaze,int jikaze) {
 		this.name = name;
@@ -36,12 +54,13 @@ public class Player {
 	public void tumo(Tile tile) {
 		tehai.add(tile);
 		te[tile.id]++;
-		this.ripai();
 		this.shanten = MillionMahjong.shanten(this);
 	}
 
 	public Tile dahai(Tile tumohai) {
 		Tile da = isReach ? tumohai : selectDahai();
+		tehai.sort((t1, t2) -> t1.id - t2.id);
+
 		tehai.remove(da);
 		te[da.id]--;
 		sutehai.add(da);
@@ -163,12 +182,7 @@ public class Player {
 		isMenzen = false;
 	}
 
-	void ripai() {
-		this.tehai.sort((t1, t2) -> t1.id - t2.id);
-	}
-
-	void printTehai() {
-		ripai();
+	String tehaiToString() {
 		String str = "";
 		for (int i = 0; i < tehai.size(); i++) {
 			if (i >= 1 && !tehai.get(i - 1).shu.equals(tehai.get(i).shu)) {
@@ -180,7 +194,7 @@ public class Player {
 		for (int i = num_fuuro - 1; i >= 0; i--) {
 			str += fuuro.get(i);
 		}
-		System.out.println(str);
+		return (str);
 	}
 
 	@Override

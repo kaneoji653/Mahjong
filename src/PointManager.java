@@ -1,29 +1,65 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class PointManager {
 	Player[] players;
 	Player oya;
 
-	PointManager(Player oya){
+	PointManager(Player[] players, Player oya){
+		this.players=players;
 		this.oya=oya;
 	}
 
 	void ron(Player houra, Player houju, int fu, int han){
 		houra.point += houraScore(houra, houju, false, fu, han);
-		houra.point -= houraScore(houra, houju, false, fu, han);
+		houju.point -= houraScore(houra, houju, false, fu, han);
 	}
 
 	void print(){
 		for(int i=0;i<4;i++){
-			System.out.print(players[0].name+":"+players[i].point+" ");
+			System.out.print(players[i].name+":"+players[i].point+" ");
 		}
 		System.out.println();
+	}
+
+	void bappu(){
+		List<Player> tempai = new ArrayList<>();
+		List<Player> noten = new ArrayList<>();
+		for(int i=0;i<4;i++){
+			if(players[i].shanten==0){
+				tempai.add(players[i]);
+			}else{
+				noten.add(players[i]);
+			}
+		}
+		switch(tempai.size()){
+		case 1:
+			tempai.get(0).point+=3000;
+			noten.get(0).point -=1000;
+			noten.get(1).point -=1000;
+			noten.get(2).point -=1000;
+			break;
+		case 2:
+			tempai.get(0).point+=1500;
+			tempai.get(1).point+=1500;
+			noten.get(0).point -=1500;
+			noten.get(1).point -=1500;
+			break;
+		case 3:
+			tempai.get(0).point+=1000;
+			tempai.get(1).point+=1000;
+			tempai.get(2).point+=1000;
+			noten.get(0).point -=3000;
+			break;
+		}
 	}
 
 	void tumo(Player houra, int fu, int han){
 		for(int i=0;i<4;i++){
 			if(players[i]==houra) continue;
 			houra.point += houraScore(houra, players[i], true, fu, han);
-			houra.point -= houraScore(houra, players[i], true, fu, han);
+			players[i].point -= houraScore(houra, players[i], true, fu, han);
+
 		}
 	}
 
@@ -82,8 +118,8 @@ public class PointManager {
 
 	final static int[][] ronOya ={
 			{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-			{-1,2400,4800,96000,12000,18000,18000,24000,24000,24000,36000,36000,48000},
-			{1500,2900,5800,116000,12000,18000,18000,24000,24000,24000,36000,36000,48000},
+			{-1,2400,4800,9600,12000,18000,18000,24000,24000,24000,36000,36000,48000},
+			{1500,2900,5800,11600,12000,18000,18000,24000,24000,24000,36000,36000,48000},
 			{2000,3900,7700,12000,12000,18000,18000,24000,24000,24000,36000,36000,48000},
 			{2400,4800,9600,12000,12000,18000,18000,24000,24000,24000,36000,36000,48000},
 			{2900,5800,11600,12000,12000,18000,18000,24000,24000,24000,36000,36000,48000},
@@ -106,7 +142,6 @@ public class PointManager {
 			{800 ,1600,2000,2000,2000,3000,3000,4000,4000,4000,6000,6000,8000},
 			{900 ,1800,2000,2000,2000,3000,3000,4000,4000,4000,6000,6000,8000}};
 
-	//ばぐっとる
 	final static int[][] tumoOya ={
 			{-1  ,700 ,1300,2600,4000,6000,6000,8000,8000,8000,12000,12000,16000},
 			{-1  ,-1  ,1600,3200,4000,6000,6000,8000,8000,8000,12000,12000,16000},

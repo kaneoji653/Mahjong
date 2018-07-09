@@ -16,14 +16,16 @@ class Agari {
 			"發", "中", "タンヤオ", "ピンフ", "イーペーコー", "三色同順", "三色同順", "三色同刻", "三暗刻", "一気通貫", "一気通貫", "七対子", "トイトイ", "チャンタ",
 			"チャンタ", "三槓子", "リャンペーコー", "純チャン", "純チャン", "ホンイツ", "ホンイツ", "小三元", "ホンロートー", "チンイツ", "チンイツ" };
 
-	Player p;
+	Player houra;
+	Player houju;
 	int head;
 	Mentu[] mentu;
 	MatiType mati;
 	boolean isTumo;
+	int num_yaku;
 	int num_dora = 0;
 	int fu;
-	int num_yaku;
+	int han;
 
 	boolean isChitoi;
 	int[] chitoiPair = new int[7];
@@ -32,9 +34,10 @@ class Agari {
 	enum MatiType {
 		RYAMMEN, KANCHAN, PENCHAN, SHAMPON, TANKI;
 	}
-	
-	Agari(Player p, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Tile> dorahyouList, boolean isChitoi, boolean isKokushi) {
-		this.p = p;
+
+	Agari(Player houra, Player houju, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Tile> dorahyouList, boolean isChitoi, boolean isKokushi) {
+		this.houra = houra;
+		this.houju = houju;
 		this.head = head;
 		this.mentu = mentu;
 		this.mati = mati;
@@ -43,31 +46,32 @@ class Agari {
 		this.isKokushi=isKokushi;
 		this.makeYaku();
 		countDora(dorahyouList);
+		han=num_dora+num_yaku;
 		countFu();
 		this.printYaku();
 	}
 
-	public static Agari agari(Player player, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
-		player.printTehai();
+	public static Agari agari(Player houra,Player houju, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
+		System.out.println(houra.tehaiToString());
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
 		List<Integer> headKouho = new ArrayList<>();
 		for (int i = 0; i < 34; i++) {
-			if (player.te[i] >= 2) {
+			if (houra.te[i] >= 2) {
 				headKouho.add(i);
 			}
 		}
 		for (Integer head : headKouho) {
-			int[] te = Arrays.copyOf(player.te, player.te.length);
+			int[] te = Arrays.copyOf(houra.te, houra.te.length);
 			te[head] -= 2;
 
 			List<MatiType> matiKouho = new ArrayList<>();
 			if (agarihai == head) {
 				matiKouho.add(MatiType.TANKI);
 			}
-			boolean isPinfu = player.num_fuuro == 0
-					&& !(head == player.bakaze || head == player.jikaze || head == 31 || head == 32 || head == 33);
+			boolean isPinfu = houra.num_fuuro == 0
+					&& !(head == houra.bakaze || head == houra.jikaze || head == 31 || head == 32 || head == 33);
 
 			// 面子分解(前から見る。3枚あるなら暗刻として除去、1枚あるなら順子として除去(できないなら終了))
 			Mentu[] mentu4 = new Mentu[4];
@@ -111,9 +115,9 @@ class Agari {
 			}
 
 			// 4面子取れたら、待ちごとにAgariインスタンス生成
-			if (m_cnt + player.num_fuuro == 4) {
-				for (int i = 0; i < player.num_fuuro; i++) {
-					mentu4[3 - i] = player.fuuro.get(i);
+			if (m_cnt + houra.num_fuuro == 4) {
+				for (int i = 0; i < houra.num_fuuro; i++) {
+					mentu4[3 - i] = houra.fuuro.get(i);
 				}
 
 				// 待ち限定
@@ -143,13 +147,13 @@ class Agari {
 				}
 
 				// あがり生成
-				agari.add(new Agari(player, head, mentu4, mati, isTumo, dorahyouList,false,false));
+				agari.add(new Agari(houra, houju, head, mentu4, mati, isTumo, dorahyouList,false,false));
 			}
 		}
 
 		if (agari.isEmpty()) {
 			if(headKouho.size()==7){
-				agari.add(new Agari(player, -1, null, MatiType.TANKI, isTumo, dorahyouList,true,false));
+				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, dorahyouList,true,false));
 			}
 		}
 		return agari.get(0);
@@ -157,13 +161,7 @@ class Agari {
 
 	@Override
 	public String toString() {
-		String str = String.format("[%d,%d]", head, head);
-		str += mentu[0].toString();
-		str += mentu[1].toString();
-		str += mentu[2].toString();
-		str += mentu[3].toString();
-		str += isTumo ? "TSUMO," : "RON,";
-		str += mati.toString();
+		String str=isTumo?"ツモ":"ロン(放銃:"+houju+") "+this.fu+"符"+this.han+"翻";
 		return str;
 	}
 
@@ -173,10 +171,10 @@ class Agari {
 			return;
 		}
 		int fu=20;
-		if(head==p.bakaze||head==p.jikaze||head==31||head==32||head==33) fu+=2;
+		if(head==houra.bakaze||head==houra.jikaze||head==31||head==32||head==33) fu+=2;
 		if(mati==MatiType.KANCHAN||mati==MatiType.PENCHAN||mati==MatiType.TANKI)fu+=2;
 		if(isTumo) fu+=2;
-		if(p.isMenzen&&!isTumo) fu+=10;
+		if(houra.isMenzen&&!isTumo) fu+=10;
 		for(Mentu m:mentu){
 			if(m.type==MentuType.ANKAN) fu+=(isYao9(m.pai[0]))?32:16;
 			if(m.type==MentuType.MINKAN) fu+=(isYao9(m.pai[0]))?16:8;
@@ -200,7 +198,7 @@ class Agari {
 
 		if(isChitoi){
 			for(int i=0;i<34;i++){
-				if(p.te[i]==2){
+				if(houra.te[i]==2){
 					if (i==0||i==8||i==9||i==17||i==18||i==26) cnt_19++;
 					switch (i/9) {
 					case 0:cnt_manzu+=2;break;
@@ -245,32 +243,32 @@ class Agari {
 					cnt_kan++;
 				}
 			}
-			p.te = te;
+			houra.te = te;
 		}
 
-		yaku[0] = p.isReach;
-		yaku[1] = p.isDoubleReach;
+		yaku[0] = houra.isReach;
+		yaku[1] = houra.isDoubleReach;
 		if (yaku[1]) {
 			yaku[0] = false;
 		}
-		yaku[2] = p.isIppatu;
-		yaku[3] = p.isHaitei;
-		yaku[4] = p.isHoutei;
-		yaku[5] = p.isRinshan;
-		yaku[6] = p.isChankan;
-		yaku[7] = p.isMenzen && this.isTumo;
-		yaku[8] = kouList.contains(p.jikaze);
-		yaku[9] = kouList.contains(p.bakaze);
+		yaku[2] = houra.isIppatu;
+		yaku[3] = houra.isHaitei;
+		yaku[4] = houra.isHoutei;
+		yaku[5] = houra.isRinshan;
+		yaku[6] = houra.isChankan;
+		yaku[7] = houra.isMenzen && this.isTumo;
+		yaku[8] = kouList.contains(houra.jikaze);
+		yaku[9] = kouList.contains(houra.bakaze);
 		yaku[10] = kouList.contains(31);
 		yaku[11] = kouList.contains(32);
 		yaku[12] = kouList.contains(33);
 		yaku[13] = cnt_19 + cnt_jihai == 0;
 		yaku[22] = isChitoi;
 		if(!isChitoi){
-			yaku[14] = p.isMenzen && mati == MatiType.RYAMMEN && head != p.jikaze && head != p.bakaze && head != 31
+			yaku[14] = houra.isMenzen && mati == MatiType.RYAMMEN && head != houra.jikaze && head != houra.bakaze && head != 31
 					&& head != 32 && head != 33 && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
 					&& mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN;
-			yaku[15] = p.isMenzen && (mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
+			yaku[15] = houra.isMenzen && (mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
 					&& mentu[0].pai[0] == mentu[1].pai[0]
 					|| mentu[1].type == MentuType.SHUN && mentu[2].type == MentuType.SHUN
 							&& mentu[1].pai[0] == mentu[2].pai[0]
@@ -278,7 +276,7 @@ class Agari {
 							&& mentu[2].pai[0] == mentu[3].pai[0]);
 			for (int i = 0; i <= 6; i++) {
 				if (shunList.contains(i) && shunList.contains(i + 9) && shunList.contains(i + 18)) {
-					if (p.isMenzen) {
+					if (houra.isMenzen) {
 						yaku[16] = true;
 					} else {
 						yaku[17] = true;
@@ -294,7 +292,7 @@ class Agari {
 			if (shunList.contains(0) && shunList.contains(3) && shunList.contains(6)
 					|| shunList.contains(9) && shunList.contains(12) && shunList.contains(15)
 					|| shunList.contains(18) && shunList.contains(21) && shunList.contains(24)) {
-				if (p.isMenzen) {
+				if (houra.isMenzen) {
 					yaku[20] = true;
 				} else {
 					yaku[21] = true;
@@ -306,13 +304,13 @@ class Agari {
 					&& (isYao9(mentu[2].pai[0]) || isYao9(mentu[2].pai[1]) || isYao9(mentu[2].pai[2]))
 					&& (isYao9(mentu[3].pai[0]) || isYao9(mentu[3].pai[1]) || isYao9(mentu[3].pai[2]))) {
 				if (cnt_jihai != 0) {
-					if (p.isMenzen) {
+					if (houra.isMenzen) {
 						yaku[24] = true;
 					} else {
 						yaku[25] = true;
 					}
 				} else {
-					if (p.isMenzen) {
+					if (houra.isMenzen) {
 						yaku[28] = true;
 					} else {
 						yaku[29] = true;
@@ -320,7 +318,7 @@ class Agari {
 				}
 			}
 			yaku[26] = cnt_kan == 3;
-			yaku[27] = p.isMenzen && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
+			yaku[27] = houra.isMenzen && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
 					&& mentu[0].pai[0] == mentu[1].pai[0] && mentu[2].type == MentuType.SHUN
 					&& mentu[3].type == MentuType.SHUN && mentu[2].pai[0] == mentu[3].pai[0];
 		}
@@ -328,13 +326,13 @@ class Agari {
 		if (cnt_manzu == 0 && cnt_pinzu == 0 && cnt_souzu != 0 || cnt_manzu == 0 && cnt_pinzu != 0 && cnt_souzu == 0
 				|| cnt_manzu != 0 && cnt_pinzu == 0 && cnt_souzu == 0) {
 			if (cnt_jihai != 0) {
-				if (p.isMenzen) {
+				if (houra.isMenzen) {
 					yaku[30] = true;
 				} else {
 					yaku[31] = true;
 				}
 			} else {
-				if (p.isMenzen) {
+				if (houra.isMenzen) {
 					yaku[34] = true;
 				} else {
 					yaku[35] = true;
@@ -350,7 +348,7 @@ class Agari {
 		if (yaku[33]) {
 			yaku[24] = yaku[25] = false;
 		}
-		
+
 		num_yaku=0;
 		for (int i=0;i<36;i++) {
 			if (yaku[i]) {
@@ -360,30 +358,22 @@ class Agari {
 	}
 
 	void countDora(List<Tile> dorahyouList) {
-		// System.out.println("ドラ表示:" + dorahyouList.size());
+		System.out.print("ドラ: ");
 		for (Tile t : dorahyouList) {
 			int dora = -1;
 			switch (t.id) {
-			case 8:
-				dora = 0;
-				break;
-			case 17:
-				dora = 9;
-				break;
-			case 26:
-				dora = 18;
-				break;
-			case 30:
-				dora = 27;
-				break;
-			case 33:
-				dora = 31;
-				break;
-			default:
-				dora = t.id + 1;
+			case 8:  dora = 0; break;
+			case 17: dora = 9; break;
+			case 26: dora = 18;	break;
+			case 30: dora = 27;	break;
+			case 33: dora = 31;	break;
+			default: dora = t.id+1;break;
 			}
-			num_dora += p.te[dora];
+			System.out.print(new Tile(dora)+" ");
+			num_dora += houra.te[dora];
 		}
+		System.out.println();
+		System.out.println();
 	}
 
 	void printYaku() {

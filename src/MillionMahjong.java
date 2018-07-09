@@ -5,18 +5,24 @@ import java.util.List;
 public class MillionMahjong {
 	public static void main(String[] args) {
 		int cnt = 0;
-		while (true) {
-			System.out.println(++cnt + "局目");
-			kyokuStart();
-		}
-	}
 
-	public static void kyokuStart() {
 		// プレイヤーの生成
 		Player[] player = new Player[4];
 		for (int i=0;i<4;i++) {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
+		PointManager pm = new PointManager(player, player[0]);
+
+		while (true) {
+			System.out.println(++cnt + "局目");
+			kyokuStart(player,pm);
+			System.out.println();
+			pm.print();
+			System.out.println("-----------------------");
+		}
+	}
+
+	public static void kyokuStart(Player[] player, PointManager pm) {
 		Player oya= player[0];
 
 		// 牌山の生成
@@ -36,6 +42,10 @@ public class MillionMahjong {
 		}
 		dorahyouList.add(wanpai.remove(0));
 
+		for(int i=0;i<4;i++){
+			player[i].initialize();
+		}
+
 		// 配牌
 		for (int i = 0; i < 13; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -44,7 +54,7 @@ public class MillionMahjong {
 		}
 
 		// 和了った人
-		int houra = -1;
+		Agari agari=null;
 		int total_kan = 0;
 
 		//////////////// 局開始/////////////////////
@@ -76,9 +86,8 @@ public class MillionMahjong {
 							dorahyouList.add(wanpai.remove(0));
 						}
 					}
-					Agari a=Agari.agari(p, tumohai.id, true, dorahyouList);
-					PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==p, true);
-					houra = ban;
+					agari=Agari.agari(p,null, tumohai.id, true, dorahyouList);
+					PointManager.printScore(agari.fu, agari.han, oya==p, true);
 					break dahaiWait;
 				}
 			}
@@ -112,7 +121,6 @@ public class MillionMahjong {
 								Player ro = player[(ban + j) % 4];
 								if (ro.shanten == 0 && !ro.sutehai.contains(new Tile(id)) && ronCheck(ro, id)) {
 									if (ro.ai.ronSelect()) {
-										houra = (ban + j) % 4;
 										ro.isChankan = true;
 										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p);
 										ro.tehai.add(new Tile(id));
@@ -122,8 +130,8 @@ public class MillionMahjong {
 												dorahyouList.add(wanpai.remove(0));
 											}
 										}
-										Agari a=Agari.agari(ro, id, false, dorahyouList);
-										PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==ro, false);
+										agari=Agari.agari(ro, p, id, false, dorahyouList);
+										PointManager.printScore(agari.fu, agari.han, oya==ro, false);
 										break dahaiWait;
 									}
 								}
@@ -146,7 +154,7 @@ public class MillionMahjong {
 				if (p.ai.reachSelect()) {
 					p.isReach = true;
 					p.isDoubleReach = isFirstTurn;
-					System.out.println(p + ":リーチ！");
+//					System.out.println(p + ":リーチ！");
 				}
 			}
 
@@ -166,9 +174,8 @@ public class MillionMahjong {
 								dorahyouList.add(wanpai.remove(0));
 							}
 						}
-						Agari a=Agari.agari(ro, da.id, false, dorahyouList);
-						PointManager.printScore(a.fu, a.num_yaku+a.num_dora, oya==ro, false);
-						houra = (ban + i) % 4;
+						agari=Agari.agari(ro, p, da.id, false, dorahyouList);
+						PointManager.printScore(agari.fu, agari.han, oya==ro, false);
 						break dahaiWait;
 					}
 				}
@@ -218,7 +225,7 @@ public class MillionMahjong {
 				}
 
 				// チーする？
-				Player tg = player[(ban + 1) % 4];
+				Player tg = player[(ban+1)%4];
 				if (!tg.isReach) {
 					// チー0する？
 					if (!da.shu.equals("z") && da.kazu != 1 && da.kazu != 2 && tg.te[da.id - 2] >= 1
@@ -257,19 +264,21 @@ public class MillionMahjong {
 			if (yama.isEmpty()) {
 				break;
 			}
-			ban = (ban + 1) % 4;
+			ban = (ban+1)%4;
 			tumohai = yama.remove(0);
 			player[ban].tumo(tumohai);
 		}
-
 		////////////////////// 局終了////////////////////////////////////
-
-		if (houra == -1) {
+		if(agari==null){
 			System.out.println("流局");
-		} else {
-
+			pm.bappu();
+		}else{
+			if(agari.isTumo){
+				pm.tumo(agari.houra, agari.fu, agari.han);
+			}else{
+				pm.ron(agari.houra, agari.houju, agari.fu, agari.han);
+			}
 		}
-		System.out.println("-----------------------");
 	}
 
 	static boolean ronCheck(Player p, int id) {
