@@ -4,7 +4,6 @@ import java.util.List;
 
 public class MillionMahjong {
 	public static void main(String[] args) {
-		int cnt = 0;
 
 		// プレイヤーの生成
 		Player[] player = new Player[4];
@@ -12,17 +11,30 @@ public class MillionMahjong {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
 		PointManager pm = new PointManager(player);
-
-		while (true) {
-			System.out.println(++cnt + "局目");
+		
+		int cnt=0;
+		while(++cnt<=10){
+			pm.initialize();
+			int kyoku = 0;
+			while(kyoku<8) {
+				kyokuStart(player,pm,kyoku,false);
+				if(pm.honba==0)kyoku++;
+			}
 			pm.print();
-			System.out.println();
-			kyokuStart(player,pm);
-			System.out.println("-----------------------");
 		}
 	}
 
-	public static void kyokuStart(Player[] player, PointManager pm) {
+	public static void kyokuStart(Player[] player, PointManager pm, int kyoku, boolean useLog) {
+		if(useLog){
+			switch(kyoku/4){
+			case 0: System.out.println("東"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
+			case 1: System.out.println("南"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
+			case 2: System.out.println("西"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
+			}
+			pm.print();
+			System.out.println();
+		}
+		
 		// 牌山の生成
 		ArrayList<Tile> yama = new ArrayList<>(136);
 		for (int id = 0; id < 34; id++) {
@@ -61,7 +73,7 @@ public class MillionMahjong {
 		boolean nagashima=false;
 		//////////////// 局開始/////////////////////
 		// 親の第一ツモ
-		int ban = 0;
+		int ban = kyoku%4;
 		Tile tumohai = yama.remove(0);
 		player[ban].tumo(tumohai);
 
@@ -74,8 +86,10 @@ public class MillionMahjong {
 				// 九種チェック
 				if(p.is9shu()){
 					if(p.ai.kyushuSelect()){
-						System.out.println(p.name+"：九種九牌");
-						System.out.println(p.tehaiToString());
+						if(useLog){
+							System.out.println(p.name+"：九種九牌");
+							System.out.println(p.tehaiToString());
+						}
 						nagare9shu=true;
 						break dahaiWait;
 					}
@@ -88,7 +102,7 @@ public class MillionMahjong {
 							&& sute==player[(ban+2)%4].sutehai.get(0).id
 							&& sute==player[(ban+3)%4].sutehai.get(0).id){
 						nagare4fuu=true;
-						System.out.println("四風連打");
+						if(useLog) System.out.println("四風連打");
 						break dahaiWait;
 					}
 				}
@@ -215,7 +229,7 @@ public class MillionMahjong {
 				pm.reach(p);
 				if(player[0].isReach&&player[1].isReach&&player[2].isReach&&player[3].isReach){
 					nagare4reach=true;
-					System.out.println("四家立直");
+					if(useLog) System.out.println("四家立直");
 					break dahaiWait;
 				}
 			}
@@ -223,7 +237,7 @@ public class MillionMahjong {
 			if(total_kan==4 && !(player[0].num_kan==4 ||player[1].num_kan==4
 					||player[2].num_kan==4 ||player[3].num_kan==4)){
 				nagare4kan=true;
-				System.out.println("四槓散了");
+				if(useLog) System.out.println("四槓散了");
 				break dahaiWait;
 			}
 
@@ -324,13 +338,19 @@ public class MillionMahjong {
 		}
 		////////////////////// 局終了////////////////////////////////////
 		if(agari==null){
-			System.out.println("流局");
+			if(useLog){
+				System.out.println("流局");
+				System.out.println("-----------------------");
+			}
 			pm.honba++;
 			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach && !nagashima){
 				pm.bappu();
 			}
 		}else{
-			agari.print();
+			if(useLog){
+				agari.print();
+				System.out.println("-----------------------");
+			}
 			if(agari.isTumo){
 				pm.tumo(agari);
 			}else{
