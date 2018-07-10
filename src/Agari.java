@@ -396,9 +396,9 @@ class Agari {
 				num_yakuman++;
 				System.out.println(yakumanMei[i]);
 			}
-			
+
 		}
-		
+
 
 	}
 

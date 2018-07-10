@@ -15,7 +15,7 @@ public class PlayerAI {
 	}
 
 	boolean ankanSelect(int id) {
-		return false;
+		return true;
 	}
 
 	boolean ponSelect(int id) {

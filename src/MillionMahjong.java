@@ -11,13 +11,13 @@ public class MillionMahjong {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
 		PointManager pm = new PointManager(player);
-		
+
 		int cnt=0;
 		while(++cnt<=10){
 			pm.initialize();
 			int kyoku = 0;
 			while(kyoku<8) {
-				kyokuStart(player,pm,kyoku,false);
+				kyokuStart(player,pm,kyoku,true);
 				if(pm.honba==0)kyoku++;
 			}
 			pm.print();
@@ -34,7 +34,7 @@ public class MillionMahjong {
 			pm.print();
 			System.out.println();
 		}
-		
+
 		// 牌山の生成
 		ArrayList<Tile> yama = new ArrayList<>(136);
 		for (int id = 0; id < 34; id++) {
@@ -63,7 +63,6 @@ public class MillionMahjong {
 			}
 		}
 
-		// 和了った人
 		Agari agari=null;
 		int total_kan = 0;
 		boolean nagare9shu=false;
@@ -71,18 +70,26 @@ public class MillionMahjong {
 		boolean nagare4kan=false;
 		boolean nagare4reach=false;
 		boolean nagashima=false;
-		//////////////// 局開始/////////////////////
-		// 親の第一ツモ
+		boolean isNakiTurn = false;
+		boolean isFirstTurn = true;
 		int ban = kyoku%4;
+		for(int i=0;i<4;i++){
+			player[(ban+i)%4].bakaze=27+kyoku/4;
+			player[(ban+i)%4].jikaze=27+kyoku%4;
+		}
+
+		//////////////// 局開始/////////////////////
+
+		// 親の第一ツモ
 		Tile tumohai = yama.remove(0);
 		player[ban].tumo(tumohai);
 
-		boolean isFirstTurn = true;
-		boolean isNakiTurn = false;
+		dahaiWait:while(true){
+			//切り番のプレイヤー（１枚ツモった状態）
+			Player p=player[ban];
 
-		dahaiWait: while (true) {
-			Player p = player[ban];
-			if (isFirstTurn) {
+			//１巡目のみ
+			if(isFirstTurn){
 				// 九種チェック
 				if(p.is9shu()){
 					if(p.ai.kyushuSelect()){
@@ -106,12 +113,13 @@ public class MillionMahjong {
 						break dahaiWait;
 					}
 				}
+				//２巡目なら何か捨て牌がある
 				if (!p.sutehai.isEmpty()) {
 					isFirstTurn = false;
 				}
 			}
 
-			// ツモあがりする？
+			//ツモ和了判定
 			if (!isNakiTurn && p.shanten==-1){
 				if(Agari.agari(p,null,tumohai.id,true,new ArrayList<>()).han>=1) {
 					if (p.ai.tsumoSelect()) {
@@ -132,8 +140,9 @@ public class MillionMahjong {
 			}
 			p.isRinshan = false;
 
+			//カン判定
 			if (!yama.isEmpty() && !isNakiTurn) {
-				// 暗カンする？
+				// 暗カン
 				for (int i = 0; i < 34; i++) {
 					if (p.te[i] == 4) {
 						if (p.ai.ankanSelect(i)) {
@@ -150,7 +159,7 @@ public class MillionMahjong {
 					}
 				}
 
-				// 加カンする？
+				// 加カン
 				for (int i = 0; i < p.num_fuuro; i++) {
 					int id = p.fuuro.get(i).pai[0];
 					if (p.fuuro.get(i).type == MentuType.PON && p.te[id] == 1) {
@@ -158,6 +167,7 @@ public class MillionMahjong {
 							p.kakan(id);
 							for(Player all:player) all.isIppatu=false;
 
+							//チャンカン判定
 							for (int j = 1; j <= 3; j++) {
 								Player ro = player[(ban + j) % 4];
 								if (ro.shanten == 0 && !ro.sutehai.contains(new Tile(id)) && ronCheck(ro, id)) {
@@ -177,7 +187,7 @@ public class MillionMahjong {
 								}
 							}
 
-							tumohai = yama.remove(0);// とりあえず山の上から引く。
+							tumohai = yama.remove(0); // とりあえず山の上から引く。
 							player[ban].tumo(tumohai);
 							p.isRinshan = true;
 							continue dahaiWait;
@@ -186,24 +196,25 @@ public class MillionMahjong {
 				}
 			}
 
-			// 打牌は？？ まだAIに委譲してない
-			Tile da = p.dahai(tumohai);
-			p.isIppatu=false;
-			isNakiTurn = false;
-
-			// リーチ宣言する？
+			//リーチ判定
 			boolean isReachTurn=false;
-			if (!p.isReach && yama.size() >= 4 && p.shanten == 0 && p.isMenzen) {
+			if (!p.isReach && yama.size() >= 4 && p.shanten <= 0 && p.isMenzen) {
 				if (p.ai.reachSelect()) {
 					isReachTurn=true;
 					p.isReach = true;
 					p.isIppatu=true;
 					p.isDoubleReach = isFirstTurn;
 //					System.out.println(p + ":リーチ！");
+//					System.out.println(p.tehaiToString());
 				}
 			}
 
-			// ロンする？
+			//打牌決定
+			Tile da = p.dahai(tumohai);
+			if(!isReachTurn)p.isIppatu=false;
+			isNakiTurn = false;
+
+			//ロン判定
 			for (int i = 1; i <= 3; i++) {
 				Player ro = player[(ban + i) % 4];
 				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da.id)) {
@@ -211,7 +222,7 @@ public class MillionMahjong {
 						if (yama.isEmpty()) {
 							ro.isHoutei = true;
 						}
-//						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
+						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
 						ro.tehai.add(da);
 						ro.te[da.id]++;
 						if (ro.isReach) {
@@ -224,16 +235,24 @@ public class MillionMahjong {
 					}
 				}
 			}
-			
+
+			//ロンされなかったら、明カンとリーチ成立
+			total_kan = player[0].num_kan + player[1].num_kan + player[2].num_kan + player[3].num_kan;
+			while (dorahyouList.size() != 1 + total_kan) {
+				dorahyouList.add(wanpai.remove(0)); //カンドラ
+			}
+			if(isReachTurn) pm.reach(p);
+
+			//四家立直チェック
 			if(isReachTurn)	{
-				pm.reach(p);
 				if(player[0].isReach&&player[1].isReach&&player[2].isReach&&player[3].isReach){
 					nagare4reach=true;
 					if(useLog) System.out.println("四家立直");
 					break dahaiWait;
 				}
 			}
-			total_kan = player[0].num_kan + player[1].num_kan + player[2].num_kan + player[3].num_kan;
+
+			//四槓散了チェック
 			if(total_kan==4 && !(player[0].num_kan==4 ||player[1].num_kan==4
 					||player[2].num_kan==4 ||player[3].num_kan==4)){
 				nagare4kan=true;
@@ -241,12 +260,12 @@ public class MillionMahjong {
 				break dahaiWait;
 			}
 
-			while (dorahyouList.size() != 1 + total_kan) {
-				dorahyouList.add(wanpai.remove(0));
-			}
+			//山がなければ流局
+			if (yama.isEmpty()) break dahaiWait;
 
+			//山があったら鳴き判定
 			if (!yama.isEmpty()) {
-				// 大明カンする？
+				//大明カン
 				for (int i = 1; i <= 3; i++) {
 					Player tg = player[(ban + i) % 4];
 					if (tg.isReach) {
@@ -258,8 +277,7 @@ public class MillionMahjong {
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
-
-							tumohai = yama.remove(0);// とりあえず山の上から引くことにしてる。
+							tumohai = yama.remove(0);// リンシャンもとりあえず山から引く。
 							player[ban].tumo(tumohai);
 							tg.isRinshan = true;
 							continue dahaiWait;
@@ -267,13 +285,11 @@ public class MillionMahjong {
 					}
 				}
 
-				// ポンする？
-				for (int i = 1; i <= 3; i++) {
+				//ポン
+				for (int i=1;i<=3;i++) {
 					Player tg = player[(ban + i) % 4];
-					if (tg.isReach) {
-						continue;
-					}
-					if (tg.te[da.id] >= 2) {
+					if (tg.isReach)continue;
+					if (tg.te[da.id]>=2){
 						if (tg.ai.ponSelect(da.id)) {
 							tg.pon(da.id);
 							for(Player all:player) all.isIppatu=false;
@@ -285,10 +301,10 @@ public class MillionMahjong {
 					}
 				}
 
-				// チーする？
+				// チー
 				Player tg = player[(ban+1)%4];
 				if (!tg.isReach) {
-					// チー0する？
+					//12(3)の形
 					if (!da.shu.equals("z") && da.kazu != 1 && da.kazu != 2 && tg.te[da.id - 2] >= 1
 							&& tg.te[da.id - 1] >= 1) {
 						if (tg.ai.chii0Select(da.id)) {
@@ -300,7 +316,7 @@ public class MillionMahjong {
 							continue dahaiWait;
 						}
 					}
-					// チー1する？
+					//1(2)3の形
 					if (!da.shu.equals("z") && da.kazu != 1 && da.kazu != 9 && tg.te[da.id - 1] >= 1
 							&& tg.te[da.id + 1] >= 1) {
 						if (tg.ai.chii1Select(da.id)) {
@@ -312,7 +328,7 @@ public class MillionMahjong {
 							continue dahaiWait;
 						}
 					}
-					// チー2する？
+					//(1)23の形
 					if (!da.shu.equals("z") && da.kazu != 8 && da.kazu != 9 && tg.te[da.id + 1] >= 1
 							&& tg.te[da.id + 2] >= 1) {
 						if (tg.ai.chii2Select(da.id)) {
@@ -328,15 +344,14 @@ public class MillionMahjong {
 			}
 
 			// 次のツモへ。
-			if (yama.isEmpty()) {
-				break;
-			}
 			ban = (ban+1)%4;
 			tumohai = yama.remove(0);
 			player[ban].tumo(tumohai);
-
 		}
+
 		////////////////////// 局終了////////////////////////////////////
+
+		//点棒移動
 		if(agari==null){
 			if(useLog){
 				System.out.println("流局");
@@ -359,11 +374,11 @@ public class MillionMahjong {
 		}
 	}
 
+	//idでロンできるかを返す。役はなくてもよい
 	static boolean ronCheck(Player ro, int id) {
 		ro.tehai.add(new Tile(id));
 		ro.te[id]++;
 		boolean canRon = shanten(ro)==-1 && Agari.agari(ro,null,id,false,new ArrayList<>()).han>=1;
-
 		ro.tehai.remove(ro.tehai.size() - 1);
 		ro.te[id]--;
 		return canRon;
@@ -377,7 +392,6 @@ public class MillionMahjong {
 
 		// メンゼンならチートイと国士のシャンテン計算
 		if (p.num_fuuro == 0) {
-
 			// 七対子のシャンテン
 			int shanten_chitoi = 6;
 			if (p.num_fuuro == 0) {
@@ -413,6 +427,8 @@ public class MillionMahjong {
 		return shanten;
 	}
 
+	//ブロックを数えてシャンテン数を計算
+	//できれば高速化したい（計算時間の99%はここなので高速化は重要）
 	static int selectBlock(int[] te, int men, int ta, int head, boolean shortcut) {
 		if (men + ta == 4) {
 			return 8 - 2 * men - ta - head;
