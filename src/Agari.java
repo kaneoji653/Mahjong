@@ -199,6 +199,7 @@ class Agari {
 		if(isChitoi){
 			for(int i=0;i<34;i++){
 				if(houra.te[i]==2){
+					te[i]=2;
 					if ((i%9==0||i%9==8)&&i<27) cnt_19++;
 					switch (i/9) {
 					case 0:cnt_manzu+=2;break;
@@ -391,8 +392,13 @@ class Agari {
 
 		num_yakuman=0;
 		for(int i=0;i<12;i++){
-			if(yakuman[i])num_yakuman++;
+			if(yakuman[i]){
+				num_yakuman++;
+				System.out.println(yakumanMei[i]);
+			}
+			
 		}
+		
 
 	}
 
@@ -431,8 +437,8 @@ class Agari {
 		}else{
 			printYaku();
 			System.out.println(this.fu +"符"+han+"翻");
-			PointManager.printScore(this);
 		}
+		PointManager.printScore(this);
 	}
 
 	void printYaku() {

@@ -78,17 +78,19 @@ public class PointManager {
 	}
 
 	int houraScore(Agari a, Player tg){
+		int han=Math.min(a.han, 13);
+		if(a.num_yakuman!=0)han=13+a.num_yakuman;		
 		if(a.isTumo){
 			if(a.houra.isOya()||tg.isOya()){
-				return tumoOya[fu_id(a.fu)][a.han-1];
+				return tumoOya[fu_id(a.fu)][han-1];
 			}else{
-				return tumoKo[fu_id(a.fu)][a.han-1];
+				return tumoKo[fu_id(a.fu)][han-1];
 			}
 		}else{
 			if(a.houra.isOya()){
-				return ronOya[fu_id(a.fu)][a.han-1];
+				return ronOya[fu_id(a.fu)][han-1];
 			}else{
-				return ronKo[fu_id(a.fu)][a.han-1];
+				return ronKo[fu_id(a.fu)][han-1];
 			}
 		}
 	}
@@ -102,17 +104,19 @@ public class PointManager {
 	}
 
 	static void printScore(Agari a){
+		int han=Math.min(a.han, 13);
+		if(a.num_yakuman!=0)han=13+a.num_yakuman;
 		if(a.isTumo){
 			if(a.houra.isOya()){
-				System.out.println(tumoOya[fu_id(a.fu)][a.han-1]+"オール");
+				System.out.println(tumoOya[fu_id(a.fu)][han-1]+"オール");
 			}else{
-				System.out.println(tumoKo[fu_id(a.fu)][a.han-1]+"-"+tumoOya[fu_id(a.fu)][a.han-1]);
+				System.out.println(tumoKo[fu_id(a.fu)][han-1]+"-"+tumoOya[fu_id(a.fu)][han-1]);
 			}
 		}else{
 			if(a.houra.isOya()){
-				System.out.println(ronOya[fu_id(a.fu)][a.han-1]);
+				System.out.println(ronOya[fu_id(a.fu)][han-1]);
 			}else{
-				System.out.println(ronKo[fu_id(a.fu)][a.han-1]);
+				System.out.println(ronKo[fu_id(a.fu)][han-1]);
 			}
 		}
 	}
