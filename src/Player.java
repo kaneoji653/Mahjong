@@ -12,6 +12,8 @@ public class Player {
 
 	int jikaze;
 	int bakaze;
+	boolean isTenho=false;
+	boolean isChiho=false;
 	boolean isReach = false;
 	boolean isDoubleReach = false;
 	boolean isIppatu = false;
@@ -33,6 +35,8 @@ public class Player {
 		num_fuuro = 0;
 		num_kan = 0;
 		shanten=8;
+		isTenho=false;
+		isChiho=false;
 		isReach = false;
 		isDoubleReach = false;
 		isIppatu = false;
@@ -48,6 +52,10 @@ public class Player {
 		this.bakaze=bakaze;
 		this.jikaze=jikaze;
 		ai = new PlayerAI();
+	}
+
+	public boolean isOya(){
+		return this.jikaze==27;
 	}
 
 	// 一枚ツモる

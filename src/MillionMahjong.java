@@ -11,7 +11,7 @@ public class MillionMahjong {
 		for (int i=0;i<4;i++) {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
 		}
-		PointManager pm = new PointManager(player, player[0]);
+		PointManager pm = new PointManager(player);
 
 		while (true) {
 			System.out.println(++cnt + "局目");
@@ -77,12 +77,12 @@ public class MillionMahjong {
 
 			// ツモあがりする？
 			if (!isNakiTurn && p.shanten==-1){
-//				System.out.println(tumohai);
 				if(Agari.agari(p,null,tumohai.id,true,new ArrayList<>()).han>=1) {
 					if (p.ai.tsumoSelect()) {
 //						System.out.println(p + ":ツモ！(" + tumohai + ")");
 						if (yama.isEmpty()) p.isHaitei = true;
-
+						if(isFirstTurn&&p.isOya()) p.isTenho=true;
+						if(isFirstTurn&&!p.isOya()) p.isChiho=true;
 
 						if (p.isReach) {
 							for (int i = 0; i < total_kan + 1; i++) {

@@ -3,11 +3,9 @@ import java.util.List;
 
 public class PointManager {
 	Player[] players;
-	Player oya;
 
-	PointManager(Player[] players, Player oya){
+	PointManager(Player[] players){
 		this.players=players;
-		this.oya=oya;
 	}
 
 	void ron(Player houra, Player houju, int fu, int han){
@@ -65,13 +63,13 @@ public class PointManager {
 
 	int houraScore(Player agari, Player tg, boolean isTumo, int fu, int han){
 		if(isTumo){
-			if(oya==agari||oya==tg){
+			if(agari.isOya()||tg.isOya()){
 				return tumoOya[fu_id(fu)][han-1];
 			}else{
 				return tumoKo[fu_id(fu)][han-1];
 			}
 		}else{
-			if(agari==oya){
+			if(agari.isOya()){
 				return ronOya[fu_id(fu)][han-1];
 			}else{
 				return ronKo[fu_id(fu)][han-1];

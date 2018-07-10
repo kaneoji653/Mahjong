@@ -25,12 +25,12 @@ class Agari {
 	MatiType mati;
 	boolean isTumo;
 	int num_yaku;
+	int num_yakuman;
 	int num_dora = 0;
 	int fu;
 	int han;
 
 	boolean isChitoi;
-	int[] chitoiPair = new int[7];
 	boolean isKokushi;
 
 	enum MatiType {
@@ -194,6 +194,7 @@ class Agari {
 		int cnt_jihai = 0;
 		int cnt_19 = 0;
 
+		int[] te = new int[34];
 		if(isChitoi){
 			for(int i=0;i<34;i++){
 				if(houra.te[i]==2){
@@ -207,7 +208,6 @@ class Agari {
 				}
 			}
 		}else{
-			int[] te = new int[34];
 			te[head] += 2;
 			if((head%9==0||head%9==8)&&head<27)cnt_19+=2;
 			switch (head/9) {
@@ -262,6 +262,9 @@ class Agari {
 		yaku[13] = cnt_19 + cnt_jihai == 0;
 		yaku[22] = isChitoi;
 		yakuman[0] = isKokushi;
+		yakuman[1] = houra.isTenho;
+		yakuman[2] = houra.isChiho;
+
 		if(!isChitoi){
 			yaku[14] = houra.isMenzen && mati == MatiType.RYAMMEN && head != houra.jikaze && head != houra.bakaze && head != 31
 					&& head != 32 && head != 33 && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
@@ -346,10 +349,36 @@ class Agari {
 			yaku[32] = true;
 		}
 		yaku[33] = (yaku[23] && (yaku[24] || yaku[25])) || (isChitoi && cnt_19+cnt_jihai==14);
+		yakuman[10]=yaku[33]&&cnt_jihai==0;
 		if (yaku[33]) {
 			yaku[24] = yaku[25] = false;
 		}
 
+		if(kouList.contains(27)&&kouList.contains(28)&&kouList.contains(29)&&kouList.contains(30)){
+			yakuman[8]=true;
+		}
+		if(		kouList.contains(27)&&kouList.contains(28)&&kouList.contains(29)&&head==30
+			||	kouList.contains(27)&&kouList.contains(28)&&kouList.contains(30)&&head==29
+			||	kouList.contains(27)&&kouList.contains(29)&&kouList.contains(30)&&head==28
+			||	kouList.contains(28)&&kouList.contains(29)&&kouList.contains(30)&&head==27){
+			yakuman[7]=true;
+		}
+		yakuman[9]=true;
+		for(int i=0;i<34;i++){
+			if(i==19||i==20||i==21||i==23||i==25||i==32)continue;
+			if(te[i]>=1){
+				yakuman[9]=false;
+				break;
+			}
+		}
+		if(yaku[34]){
+			for(int i=0;i<3;i++){
+				if(te[0+i*9]>=3 && te[1+i*9]>=1 && te[2+i*9]>=1 &&te[3+i*9]>=1 &&te[4+i*9]>=1
+						&&te[5+i*9]>=1 &&te[6+i*9]>=1 &&te[7+i*9]>=1 &&te[8+i*9]>=3){
+					yakuman[11]=true;
+				}
+			}
+		}
 
 
 		num_yaku=0;
@@ -390,7 +419,7 @@ class Agari {
 		System.out.println(houra.tehaiToString());
 		printYaku();
 		System.out.println(this.fu +"符"+han+"翻");
-		PointManager.printScore(fu,han,houra.jikaze==27,isTumo);
+		PointManager.printScore(fu,han,houra.isOya(),isTumo);
 	}
 
 	void printYaku() {
