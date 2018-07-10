@@ -15,9 +15,9 @@ public class MillionMahjong {
 
 		while (true) {
 			System.out.println(++cnt + "局目");
-			kyokuStart(player,pm);
-			System.out.println();
 			pm.print();
+			System.out.println();
+			kyokuStart(player,pm);
 			System.out.println("-----------------------");
 		}
 	}
@@ -57,6 +57,7 @@ public class MillionMahjong {
 		boolean nagare9shu=false;
 		boolean nagare4fuu=false;
 		boolean nagare4kan=false;
+		boolean nagare4reach=false;
 		boolean nagashima=false;
 		//////////////// 局開始/////////////////////
 		// 親の第一ツモ
@@ -73,6 +74,8 @@ public class MillionMahjong {
 				// 九種チェック
 				if(p.is9shu()){
 					if(p.ai.kyushuSelect()){
+						System.out.println(p.name+"：九種九牌");
+						System.out.println(p.tehaiToString());
 						nagare9shu=true;
 						break dahaiWait;
 					}
@@ -85,6 +88,7 @@ public class MillionMahjong {
 							&& sute==player[(ban+2)%4].sutehai.get(0).id
 							&& sute==player[(ban+3)%4].sutehai.get(0).id){
 						nagare4fuu=true;
+						System.out.println("四風連打");
 						break dahaiWait;
 					}
 				}
@@ -174,8 +178,10 @@ public class MillionMahjong {
 			isNakiTurn = false;
 
 			// リーチ宣言する？
+			boolean isReachTurn=false;
 			if (!p.isReach && yama.size() >= 4 && p.shanten == 0 && p.isMenzen) {
 				if (p.ai.reachSelect()) {
+					isReachTurn=true;
 					p.isReach = true;
 					p.isIppatu=true;
 					p.isDoubleReach = isFirstTurn;
@@ -204,11 +210,20 @@ public class MillionMahjong {
 					}
 				}
 			}
-
+			
+			if(isReachTurn)	{
+				pm.reach(p);
+				if(player[0].isReach&&player[1].isReach&&player[2].isReach&&player[3].isReach){
+					nagare4reach=true;
+					System.out.println("：四家立直");
+					break dahaiWait;
+				}
+			}
 			total_kan = player[0].num_kan + player[1].num_kan + player[2].num_kan + player[3].num_kan;
 			if(total_kan==4 && !(player[0].num_kan==4 ||player[1].num_kan==4
 					||player[2].num_kan==4 ||player[3].num_kan==4)){
 				nagare4kan=true;
+				System.out.println("四槓散了");
 				break dahaiWait;
 			}
 
@@ -310,7 +325,8 @@ public class MillionMahjong {
 		////////////////////// 局終了////////////////////////////////////
 		if(agari==null){
 			System.out.println("流局");
-			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagashima){
+			pm.honba++;
+			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach && !nagashima){
 				pm.bappu();
 			}
 		}else{

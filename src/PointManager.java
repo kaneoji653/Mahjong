@@ -11,8 +11,13 @@ public class PointManager {
 	}
 
 	void ron(Player houra, Player houju, int fu, int han){
-		houra.point += houraScore(houra, houju, false, fu, han);
-		houju.point -= houraScore(houra, houju, false, fu, han);
+		houra.point += houraScore(houra, houju, false, fu, han) + honba*300;
+		houju.point -= houraScore(houra, houju, false, fu, han) + honba*300;
+		houra.point+= kyotaku*1000;
+		kyotaku=0;
+		if(houra.isOya()) honba++;
+		else honba=0;
+
 	}
 
 	void print(){
@@ -20,6 +25,12 @@ public class PointManager {
 			System.out.print(players[i].name+":"+players[i].point+" ");
 		}
 		System.out.println();
+		System.out.println(honba+"本場　供託："+kyotaku);
+	}
+	
+	void reach(Player r){
+		r.point-=1000;
+		kyotaku++;
 	}
 
 	void bappu(){
@@ -57,10 +68,13 @@ public class PointManager {
 	void tumo(Player houra, int fu, int han){
 		for(int i=0;i<4;i++){
 			if(players[i]==houra) continue;
-			houra.point += houraScore(houra, players[i], true, fu, han);
-			players[i].point -= houraScore(houra, players[i], true, fu, han);
-
+			houra.point += houraScore(houra, players[i], true, fu, han) + honba*100;
+			players[i].point -= houraScore(houra, players[i], true, fu, han) + honba*100;
 		}
+		if(houra.isOya()) honba++;
+		else honba=0;
+		houra.point+= kyotaku*1000;
+		kyotaku=0;
 	}
 
 	int houraScore(Player agari, Player tg, boolean isTumo, int fu, int han){

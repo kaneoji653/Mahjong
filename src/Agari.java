@@ -415,7 +415,7 @@ class Agari {
 	}
 
 	void print(){
-		System.out.println(houra.name +(isTumo? ":" : "←"+houju+":"));
+		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
 		System.out.println(houra.tehaiToString());
 		printYaku();
 		System.out.println(this.fu +"符"+han+"翻");
