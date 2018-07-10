@@ -23,7 +23,6 @@ public class MillionMahjong {
 	}
 
 	public static void kyokuStart(Player[] player, PointManager pm) {
-
 		// 牌山の生成
 		ArrayList<Tile> yama = new ArrayList<>(136);
 		for (int id = 0; id < 34; id++) {
@@ -55,7 +54,10 @@ public class MillionMahjong {
 		// 和了った人
 		Agari agari=null;
 		int total_kan = 0;
-
+		boolean nagare9shu=false;
+		boolean nagare4fuu=false;
+		boolean nagare4kan=false;
+		boolean nagashima=false;
 		//////////////// 局開始/////////////////////
 		// 親の第一ツモ
 		int ban = 0;
@@ -69,7 +71,23 @@ public class MillionMahjong {
 			Player p = player[ban];
 			if (isFirstTurn) {
 				// 九種チェック
-
+				if(p.is9shu()){
+					if(p.ai.kyushuSelect()){
+						nagare9shu=true;
+						break dahaiWait;
+					}
+				}
+				// 四風チェック
+				if(p.isOya() && p.sutehai.size()==1){
+					int sute=p.sutehai.get(0).id;
+					if((sute==27||sute==28||sute==29||sute==30)
+							&& sute==player[(ban+1)%4].sutehai.get(0).id
+							&& sute==player[(ban+2)%4].sutehai.get(0).id
+							&& sute==player[(ban+3)%4].sutehai.get(0).id){
+						nagare4fuu=true;
+						break dahaiWait;
+					}
+				}
 				if (!p.sutehai.isEmpty()) {
 					isFirstTurn = false;
 				}
@@ -108,6 +126,7 @@ public class MillionMahjong {
 							tumohai = yama.remove(0);// とりあえず山の上から引く。
 							player[ban].tumo(tumohai);
 							p.isRinshan = true;
+							for(Player all:player) all.isIppatu=false;
 							continue dahaiWait;
 						}
 					}
@@ -119,6 +138,7 @@ public class MillionMahjong {
 					if (p.fuuro.get(i).type == MentuType.PON && p.te[id] == 1) {
 						if (p.ai.kakanSelect(id)) {
 							p.kakan(id);
+							for(Player all:player) all.isIppatu=false;
 
 							for (int j = 1; j <= 3; j++) {
 								Player ro = player[(ban + j) % 4];
@@ -150,12 +170,14 @@ public class MillionMahjong {
 
 			// 打牌は？？ まだAIに委譲してない
 			Tile da = p.dahai(tumohai);
+			p.isIppatu=false;
 			isNakiTurn = false;
 
 			// リーチ宣言する？
 			if (!p.isReach && yama.size() >= 4 && p.shanten == 0 && p.isMenzen) {
 				if (p.ai.reachSelect()) {
 					p.isReach = true;
+					p.isIppatu=true;
 					p.isDoubleReach = isFirstTurn;
 //					System.out.println(p + ":リーチ！");
 				}
@@ -184,6 +206,11 @@ public class MillionMahjong {
 			}
 
 			total_kan = player[0].num_kan + player[1].num_kan + player[2].num_kan + player[3].num_kan;
+			if(total_kan==4 && !(player[0].num_kan==4 ||player[1].num_kan==4
+					||player[2].num_kan==4 ||player[3].num_kan==4)){
+				nagare4kan=true;
+				break dahaiWait;
+			}
 
 			while (dorahyouList.size() != 1 + total_kan) {
 				dorahyouList.add(wanpai.remove(0));
@@ -199,6 +226,7 @@ public class MillionMahjong {
 					if (tg.te[da.id] == 3) {
 						if (tg.ai.minkanSelect(da.id)) {
 							tg.minkan(da.id);
+							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
 
@@ -219,6 +247,7 @@ public class MillionMahjong {
 					if (tg.te[da.id] >= 2) {
 						if (tg.ai.ponSelect(da.id)) {
 							tg.pon(da.id);
+							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + i) % 4;
 							isNakiTurn = true;
@@ -235,6 +264,7 @@ public class MillionMahjong {
 							&& tg.te[da.id - 1] >= 1) {
 						if (tg.ai.chii0Select(da.id)) {
 							tg.chii0(da.id);
+							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							isNakiTurn = true;
@@ -246,6 +276,7 @@ public class MillionMahjong {
 							&& tg.te[da.id + 1] >= 1) {
 						if (tg.ai.chii1Select(da.id)) {
 							tg.chii1(da.id);
+							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							isNakiTurn = true;
@@ -257,6 +288,7 @@ public class MillionMahjong {
 							&& tg.te[da.id + 2] >= 1) {
 						if (tg.ai.chii2Select(da.id)) {
 							tg.chii2(da.id);
+							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban + 1) % 4;
 							isNakiTurn = true;
@@ -278,7 +310,9 @@ public class MillionMahjong {
 		////////////////////// 局終了////////////////////////////////////
 		if(agari==null){
 			System.out.println("流局");
-			pm.bappu();
+			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagashima){
+				pm.bappu();
+			}
 		}else{
 			agari.print();
 			if(agari.isTumo){

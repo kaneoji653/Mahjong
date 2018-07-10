@@ -3,6 +3,8 @@ import java.util.List;
 
 public class PointManager {
 	Player[] players;
+	int honba=0;
+	int kyotaku=0;
 
 	PointManager(Player[] players){
 		this.players=players;

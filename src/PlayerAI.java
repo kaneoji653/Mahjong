@@ -1,6 +1,11 @@
 
 public class PlayerAI {
 	boolean naki=false;
+
+	boolean kyushuSelect(){
+		return true;
+	}
+	
 	boolean kakanSelect(int id) {
 		return naki;
 	}

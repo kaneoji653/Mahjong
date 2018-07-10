@@ -57,6 +57,24 @@ public class Player {
 	public boolean isOya(){
 		return this.jikaze==27;
 	}
+	
+	boolean is9shu(){
+		int cnt=0;
+		if(te[0]>=1)cnt++;
+		if(te[8]>=1)cnt++;
+		if(te[9]>=1)cnt++;
+		if(te[17]>=1)cnt++;
+		if(te[18]>=1)cnt++;
+		if(te[26]>=1)cnt++;
+		if(te[27]>=1)cnt++;
+		if(te[28]>=1)cnt++;
+		if(te[29]>=1)cnt++;
+		if(te[30]>=1)cnt++;
+		if(te[31]>=1)cnt++;
+		if(te[32]>=1)cnt++;
+		if(te[33]>=1)cnt++;
+		return cnt>=9;
+	}
 
 	// 一枚ツモる
 	public void tumo(Tile tile) {
