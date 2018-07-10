@@ -179,6 +179,7 @@ class Agari {
 			if(m.type==MentuType.PON) fu+=(isYao9(m.pai[0]))?4:2;
 		}
 		if(!houra.isMenzen&&fu==20)fu=30;
+		if(yaku[7]&&yaku[14]) fu=20;
 		while(fu%10!=0) fu+=2;
 		this.fu=fu;
 	}
@@ -388,6 +389,10 @@ class Agari {
 			}
 		}
 
+		num_yakuman=0;
+		for(int i=0;i<12;i++){
+			if(yakuman[i])num_yakuman++;
+		}
 
 	}
 
@@ -417,12 +422,21 @@ class Agari {
 	void print(){
 		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
 		System.out.println(houra.tehaiToString());
-		printYaku();
-		System.out.println(this.fu +"符"+han+"翻");
-		PointManager.printScore(fu,han,houra.isOya(),isTumo);
+		if(num_yakuman!=0){
+			for (int i=0;i<12;i++) {
+				if (yakuman[i]) {
+					System.out.println(yakumanMei[i]);
+				}
+			}
+		}else{
+			printYaku();
+			System.out.println(this.fu +"符"+han+"翻");
+			PointManager.printScore(this);
+		}
 	}
 
 	void printYaku() {
+
 		for (int i = 0; i < 36; i++) {
 			if (yaku[i]) {
 				System.out.println(yakuMei[i]);

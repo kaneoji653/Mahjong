@@ -215,7 +215,7 @@ public class MillionMahjong {
 				pm.reach(p);
 				if(player[0].isReach&&player[1].isReach&&player[2].isReach&&player[3].isReach){
 					nagare4reach=true;
-					System.out.println("：四家立直");
+					System.out.println("四家立直");
 					break dahaiWait;
 				}
 			}
@@ -332,9 +332,9 @@ public class MillionMahjong {
 		}else{
 			agari.print();
 			if(agari.isTumo){
-				pm.tumo(agari.houra, agari.fu, agari.han);
+				pm.tumo(agari);
 			}else{
-				pm.ron(agari.houra, agari.houju, agari.fu, agari.han);
+				pm.ron(agari);
 			}
 		}
 	}

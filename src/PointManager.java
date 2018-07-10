@@ -10,12 +10,12 @@ public class PointManager {
 		this.players=players;
 	}
 
-	void ron(Player houra, Player houju, int fu, int han){
-		houra.point += houraScore(houra, houju, false, fu, han) + honba*300;
-		houju.point -= houraScore(houra, houju, false, fu, han) + honba*300;
-		houra.point+= kyotaku*1000;
+	void ron(Agari a){
+		a.houra.point += houraScore(a, a.houju) + honba*300;
+		a.houju.point -= houraScore(a, a.houju) + honba*300;
+		a.houra.point+= kyotaku*1000;
 		kyotaku=0;
-		if(houra.isOya()) honba++;
+		if(a.houra.isOya()) honba++;
 		else honba=0;
 
 	}
@@ -27,7 +27,7 @@ public class PointManager {
 		System.out.println();
 		System.out.println(honba+"本場　供託："+kyotaku);
 	}
-	
+
 	void reach(Player r){
 		r.point-=1000;
 		kyotaku++;
@@ -65,30 +65,30 @@ public class PointManager {
 		}
 	}
 
-	void tumo(Player houra, int fu, int han){
+	void tumo(Agari a){
 		for(int i=0;i<4;i++){
-			if(players[i]==houra) continue;
-			houra.point += houraScore(houra, players[i], true, fu, han) + honba*100;
-			players[i].point -= houraScore(houra, players[i], true, fu, han) + honba*100;
+			if(players[i]==a.houra) continue;
+			a.houra.point += houraScore(a, players[i]) + honba*100;
+			players[i].point -= houraScore(a, players[i]) + honba*100;
 		}
-		if(houra.isOya()) honba++;
+		if(a.houra.isOya()) honba++;
 		else honba=0;
-		houra.point+= kyotaku*1000;
+		a.houra.point+= kyotaku*1000;
 		kyotaku=0;
 	}
 
-	int houraScore(Player agari, Player tg, boolean isTumo, int fu, int han){
-		if(isTumo){
-			if(agari.isOya()||tg.isOya()){
-				return tumoOya[fu_id(fu)][han-1];
+	int houraScore(Agari a, Player tg){
+		if(a.isTumo){
+			if(a.houra.isOya()||tg.isOya()){
+				return tumoOya[fu_id(a.fu)][a.han-1];
 			}else{
-				return tumoKo[fu_id(fu)][han-1];
+				return tumoKo[fu_id(a.fu)][a.han-1];
 			}
 		}else{
-			if(agari.isOya()){
-				return ronOya[fu_id(fu)][han-1];
+			if(a.houra.isOya()){
+				return ronOya[fu_id(a.fu)][a.han-1];
 			}else{
-				return ronKo[fu_id(fu)][han-1];
+				return ronKo[fu_id(a.fu)][a.han-1];
 			}
 		}
 	}
@@ -101,18 +101,18 @@ public class PointManager {
 		}
 	}
 
-	static void printScore(int fu,int han,boolean isOya,boolean isTumo){
-		if(isTumo){
-			if(isOya){
-				System.out.println(tumoOya[fu_id(fu)][han-1]+"オール");
+	static void printScore(Agari a){
+		if(a.isTumo){
+			if(a.houra.isOya()){
+				System.out.println(tumoOya[fu_id(a.fu)][a.han-1]+"オール");
 			}else{
-				System.out.println(tumoKo[fu_id(fu)][han-1]+"-"+tumoOya[fu_id(fu)][han-1]);
+				System.out.println(tumoKo[fu_id(a.fu)][a.han-1]+"-"+tumoOya[fu_id(a.fu)][a.han-1]);
 			}
 		}else{
-			if(isOya){
-				System.out.println(ronOya[fu_id(fu)][han-1]);
+			if(a.houra.isOya()){
+				System.out.println(ronOya[fu_id(a.fu)][a.han-1]);
 			}else{
-				System.out.println(ronKo[fu_id(fu)][han-1]);
+				System.out.println(ronKo[fu_id(a.fu)][a.han-1]);
 			}
 		}
 	}
