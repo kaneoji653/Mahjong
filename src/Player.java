@@ -83,8 +83,8 @@ public class Player {
 		this.shanten = MillionMahjong.shanten(this);
 	}
 
-	public Tile dahai(Tile tumohai) {
-		Tile da = isReach ? tumohai : selectDahai();
+	public Tile dahai(Tile tumohai, boolean isReachTurn) {
+		Tile da = isReach&&!isReachTurn ? tumohai : selectDahai();
 		tehai.sort((t1, t2) -> t1.id - t2.id);
 
 		tehai.remove(da);

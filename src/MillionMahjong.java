@@ -16,15 +16,29 @@ public class MillionMahjong {
 		while(++cnt<=10){
 			pm.initialize();
 			int kyoku = 0;
-			while(kyoku<8) {
-				kyokuStart(player,pm,kyoku,true);
+			while(kyoku<8 || kyoku<12&&pm.isShaNyu()) {
+				boolean tokushuNagare = !kyokuStart(player,pm,kyoku,false);
+				if(pm.existTobi()) break;
 				if(pm.honba==0)kyoku++;
+				if(kyoku==7 && pm.honba>=1 && !tokushuNagare && !pm.isShaNyu() && rank(player,3)==1) break;
 			}
 			pm.print();
+			System.out.println(rank(player,0)+" "+rank(player,1)+" "+rank(player,2)+" "+rank(player,3));
 		}
 	}
+	
+	public static int rank(Player[] ps,int no){
+		int r=1;
+		for(int i=0;i<=no-1;i++){
+			if(ps[no].point<=ps[i].point) r++;
+		}
+		for(int i=no+1;i<4;i++){
+			if(ps[no].point<ps[i].point) r++;			
+		}
+		return r;
+	}
 
-	public static void kyokuStart(Player[] player, PointManager pm, int kyoku, boolean useLog) {
+	public static boolean kyokuStart(Player[] player, PointManager pm, int kyoku, boolean useLog) {
 		if(useLog){
 			switch(kyoku/4){
 			case 0: System.out.println("東"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
@@ -69,13 +83,12 @@ public class MillionMahjong {
 		boolean nagare4fuu=false;
 		boolean nagare4kan=false;
 		boolean nagare4reach=false;
-		boolean nagashima=false;
 		boolean isNakiTurn = false;
 		boolean isFirstTurn = true;
 		int ban = kyoku%4;
 		for(int i=0;i<4;i++){
 			player[(ban+i)%4].bakaze=27+kyoku/4;
-			player[(ban+i)%4].jikaze=27+kyoku%4;
+			player[(ban+i)%4].jikaze=27+i;
 		}
 
 		//////////////// 局開始/////////////////////
@@ -198,31 +211,30 @@ public class MillionMahjong {
 
 			//リーチ判定
 			boolean isReachTurn=false;
-			if (!p.isReach && yama.size() >= 4 && p.shanten <= 0 && p.isMenzen) {
+			if (!p.isReach && yama.size() >= 4 && p.shanten <= 0 && p.isMenzen && p.point>=1000) {
 				if (p.ai.reachSelect()) {
 					isReachTurn=true;
 					p.isReach = true;
 					p.isIppatu=true;
 					p.isDoubleReach = isFirstTurn;
 //					System.out.println(p + ":リーチ！");
-//					System.out.println(p.tehaiToString());
 				}
 			}
 
 			//打牌決定
-			Tile da = p.dahai(tumohai);
+			Tile da = p.dahai(tumohai,isReachTurn);
 			if(!isReachTurn)p.isIppatu=false;
 			isNakiTurn = false;
 
 			//ロン判定
-			for (int i = 1; i <= 3; i++) {
+			for (int i=1;i<=3;i++) {
 				Player ro = player[(ban + i) % 4];
 				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da.id)) {
 					if (ro.ai.ronSelect()) {
 						if (yama.isEmpty()) {
 							ro.isHoutei = true;
 						}
-						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
+//						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
 						ro.tehai.add(da);
 						ro.te[da.id]++;
 						if (ro.isReach) {
@@ -241,7 +253,7 @@ public class MillionMahjong {
 			while (dorahyouList.size() != 1 + total_kan) {
 				dorahyouList.add(wanpai.remove(0)); //カンドラ
 			}
-			if(isReachTurn) pm.reach(p);
+			if(isReachTurn)	pm.reach(p);
 
 			//四家立直チェック
 			if(isReachTurn)	{
@@ -358,7 +370,7 @@ public class MillionMahjong {
 				System.out.println("-----------------------");
 			}
 			pm.honba++;
-			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach && !nagashima){
+			if(!nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach){
 				pm.bappu();
 			}
 		}else{
@@ -372,6 +384,8 @@ public class MillionMahjong {
 				pm.ron(agari);
 			}
 		}
+		
+		return !nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach;
 	}
 
 	//idでロンできるかを返す。役はなくてもよい

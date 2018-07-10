@@ -9,7 +9,7 @@ public class PointManager {
 	PointManager(Player[] players){
 		this.players=players;
 	}
-	
+
 	void initialize(){
 		honba=0;
 		kyotaku=0;
@@ -23,7 +23,20 @@ public class PointManager {
 		kyotaku=0;
 		if(a.houra.isOya()) honba++;
 		else honba=0;
+	}
 
+	boolean existTobi(){
+		for(Player p:players){
+			if(p.point<0)return true;
+		}
+		return false;
+	}
+
+	boolean isShaNyu(){
+		for(Player p:players){
+			if(p.point>=30000) return false;
+		}
+		return true;
 	}
 
 	void print(){
@@ -84,7 +97,7 @@ public class PointManager {
 
 	int houraScore(Agari a, Player tg){
 		int han=Math.min(a.han, 13);
-		if(a.num_yakuman!=0)han=12+a.num_yakuman;		
+		if(a.num_yakuman!=0)han=12+a.num_yakuman;
 		if(a.isTumo){
 			if(a.houra.isOya()||tg.isOya()){
 				return tumoOya[fu_id(a.fu)][han-1];
