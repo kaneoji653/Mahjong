@@ -4,7 +4,6 @@ import java.util.List;
 
 public class MillionMahjong {
 	public static void main(String[] args) {
-
 		// プレイヤーの生成
 		Player[] player = new Player[4];
 		for (int i=0;i<4;i++) {
@@ -13,12 +12,12 @@ public class MillionMahjong {
 		PointManager pm = new PointManager(player);
 
 		int cnt=0;
-		while(++cnt<=50000000){
+		while(++cnt<=50000){
 			if(cnt%10000==0) System.out.println(cnt+"試合");
 			pm.initialize();
 			int kyoku = 0;
 			while(kyoku<8 || kyoku<12&&pm.isShaNyu()) {
-				boolean tokushuNagare = !kyokuStart(player,pm,kyoku,false);
+				boolean tokushuNagare = !kyokuStart(player,pm,kyoku,true);
 				if(pm.existTobi()) break;
 				if(pm.honba==0)kyoku++;
 				if(kyoku==7 && pm.honba>=1 && !tokushuNagare && !pm.isShaNyu() && pm.rank(3)==1) break;
@@ -234,7 +233,7 @@ public class MillionMahjong {
 
 			//ロンされなかったら、明カンとリーチ成立
 			total_kan = player[0].num_kan + player[1].num_kan + player[2].num_kan + player[3].num_kan;
-			while (doraList.size() != 1+total_kan) {
+			while (doraList.size() < 1+total_kan) {
 				doraList.add(wanpai.remove(0)); //カンドラ
 				uraList.add(wanpai.remove(0)); //カン裏ドラ
 			}
@@ -250,8 +249,8 @@ public class MillionMahjong {
 			}
 
 			//四槓散了チェック
-			if(total_kan==4 && !(player[0].num_kan==4 ||player[1].num_kan==4
-					||player[2].num_kan==4 ||player[3].num_kan==4)){
+			if(total_kan==5 || total_kan==4 
+					&& !(player[0].num_kan==4 ||player[1].num_kan==4||player[2].num_kan==4 ||player[3].num_kan==4)){
 				nagare4kan=true;
 				if(useLog) System.out.println("四槓散了");
 				break dahaiWait;
@@ -263,17 +262,14 @@ public class MillionMahjong {
 			//山があったら鳴き判定
 			if (!yama.isEmpty()) {
 				//大明カン
-				for (int i = 1; i <= 3; i++) {
-					Player tg = player[(ban + i) % 4];
-					if (tg.isReach) {
-						continue;
-					}
-					if (tg.tm.te[da]==3) {
+				for (int i=1;i<=3;i++) {
+					Player tg = player[(ban+i)%4];
+					if (!tg.isReach && tg.tm.te[da]==3) {
 						if (tg.ai.minkanSelect(da)) {
 							tg.minkan(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
-							ban = (ban + i) % 4;
+							ban =(ban+i)%4;
 							tumohai = yama.remove(0);// リンシャンもとりあえず山から引く。
 							player[ban].tumo(tumohai);
 							tg.isRinshan = true;
@@ -284,9 +280,8 @@ public class MillionMahjong {
 
 				//ポン
 				for (int i=1;i<=3;i++) {
-					Player tg = player[(ban + i) % 4];
-					if (tg.isReach)continue;
-					if (tg.tm.te[da]>=2){
+					Player tg = player[(ban+i)%4];
+					if (!tg.isReach && tg.tm.te[da]>=2){
 						if (tg.ai.ponSelect(da)) {
 							tg.pon(da);
 							for(Player all:player) all.isIppatu=false;
@@ -303,8 +298,8 @@ public class MillionMahjong {
 				if (!tg.isReach) {
 					//12(3)の形
 					if (da<27 && da%9!=0 && da%9!=1 && tg.tm.te[da-2]>=1 && tg.tm.te[da-1]>=1) {
-						if (tg.ai.chii0Select(da)) {
-							tg.chii0(da);
+						if (tg.ai.chi0Select(da)) {
+							tg.chi0(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban+1)%4;
@@ -314,8 +309,8 @@ public class MillionMahjong {
 					}
 					//1(2)3の形
 					if (da<27 && da%9!=0 && da%9!=8 && tg.tm.te[da-1]>=1 && tg.tm.te[da+1]>=1) {
-						if (tg.ai.chii1Select(da)) {
-							tg.chii1(da);
+						if (tg.ai.chi1Select(da)) {
+							tg.chi1(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban+1)%4;
@@ -325,8 +320,8 @@ public class MillionMahjong {
 					}
 					//(1)23の形
 					if (da<27 && da%9!=7 && da%9!=8 && tg.tm.te[da+1]>=1 && tg.tm.te[da+2]>=1) {
-						if (tg.ai.chii2Select(da)) {
-							tg.chii2(da);
+						if (tg.ai.chi2Select(da)) {
+							tg.chi2(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban+1)%4;

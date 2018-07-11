@@ -103,7 +103,7 @@ public class Player {
 	}
 
 	void kakan(int id) {
-//		 System.out.println(this.name+"：カン！("+new Tile(id)+")");
+//		System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		tm.te[id]--;
 		Mentu f = null;
 		for (int i = 0; i < fuuro.size(); i++) {
@@ -135,7 +135,7 @@ public class Player {
 		isMenzen = false;
 	}
 
-	void chii0(int id) {
+	void chi0(int id) {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		tm.te[id - 2]--;
 		tm.te[id - 1]--;
@@ -148,7 +148,7 @@ public class Player {
 		if(tm.te[id]<0)System.out.println("チー0エラー");
 	}
 
-	void chii1(int id) {
+	void chi1(int id) {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		tm.te[id - 1]--;
 		tm.te[id + 1]--;
@@ -158,7 +158,7 @@ public class Player {
 		isMenzen = false;
 	}
 
-	void chii2(int id) {
+	void chi2(int id) {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		tm.te[id + 1]--;
 		tm.te[id + 2]--;

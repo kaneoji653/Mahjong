@@ -448,8 +448,8 @@ class Agari {
 	}
 
 	void print(){
-//		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
-//		houra.tm.print();
+		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
+		houra.tm.print();
 		if(num_yakuman!=0){
 			for (int i=0;i<12;i++) {
 				if (yakuman[i]) {
@@ -458,9 +458,9 @@ class Agari {
 			}
 		}else{
 			printYaku();
-//			System.out.println(this.fu +"符"+han+"翻");
+			System.out.println(this.fu +"符"+han+"翻");
 		}
-//		PointManager.printScore(this);
+		PointManager.printScore(this);
 	}
 
 	void printYaku() {

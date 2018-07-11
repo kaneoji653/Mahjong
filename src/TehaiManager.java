@@ -97,7 +97,7 @@ public class TehaiManager{
 	}
 
 	int shantenKokusi(){
-		int shanten = 100;
+		int shanten = 13;
 		int head = 0;
 		if (te[0]>=1)shanten--; if(te[0]>=2)head=1;
 		if (te[8]>=1)shanten--; if(te[8]>=2)head=1;

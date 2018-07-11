@@ -1,8 +1,8 @@
 
-public class PlayerAI {
+public class PlayerAI extends AbstractPlayerAI {
 	boolean naki=true;
 
-	boolean kyushuSelect(){
+	public boolean kyushuSelect(){
 		return false;
 	}
 
@@ -22,15 +22,15 @@ public class PlayerAI {
 		return naki;
 	}
 
-	boolean chii0Select(int id) {
+	boolean chi0Select(int id) {
 		return naki;
 	}
 
-	boolean chii1Select(int id) {
+	boolean chi1Select(int id) {
 		return naki;
 	}
 
-	boolean chii2Select(int id) {
+	boolean chi2Select(int id) {
 		return naki;
 	}
 
