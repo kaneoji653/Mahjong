@@ -1,3 +1,4 @@
+
 public class Mentu {
 	MentuType type;
 	int[] pai;
@@ -6,7 +7,12 @@ public class Mentu {
 	Mentu(MentuType type, int[] pai) {
 		this.type = type;
 		this.pai = pai;
-		this.shu = new Tile(pai[0]).shu;
+		switch(pai[0]/9){
+		case 0 : shu="m"; break;
+		case 1 : shu="p"; break;
+		case 2 : shu="s"; break;
+		case 3 : shu="z"; break;
+		}
 	}
 
 	@Override

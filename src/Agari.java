@@ -37,7 +37,7 @@ class Agari {
 		RYAMMEN, KANCHAN, PENCHAN, SHAMPON, TANKI;
 	}
 
-	Agari(Player houra, Player houju, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Tile> dorahyouList, boolean isChitoi, boolean isKokushi) {
+	Agari(Player houra, Player houju, int head, Mentu[] mentu, MatiType mati, boolean isTumo, List<Integer> doraList, List<Integer> uraList, boolean isChitoi, boolean isKokushi) {
 		this.houra = houra;
 		this.houju = houju;
 		this.head = head;
@@ -47,12 +47,12 @@ class Agari {
 		this.isChitoi=isChitoi;
 		this.isKokushi=isKokushi;
 		this.makeYaku();
-		countDora(dorahyouList);
+		countDora(doraList,uraList);
 		han=num_dora+num_yaku;
 		countFu();
 	}
 
-	public static Agari agari(Player houra,Player houju, int agarihai, boolean isTumo, List<Tile> dorahyouList) {
+	public static Agari agari(Player houra,Player houju, int agarihai, boolean isTumo, List<Integer> doraList, List<Integer> uraList) {
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
@@ -147,16 +147,16 @@ class Agari {
 				}
 
 				// あがり生成
-				agari.add(new Agari(houra, houju, head, mentu4, mati, isTumo, dorahyouList,false,false));
+				agari.add(new Agari(houra, houju, head, mentu4, mati, isTumo, doraList, uraList,false,false));
 			}
 		}
 
 		if (agari.isEmpty()) {
 			if(headKouho.size()==7){
-				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, dorahyouList,true,false));
+				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, doraList, uraList,true,false));
 			}else{
 				System.out.println("こくしむそおおおおおおおおおおおおおお");
-				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, dorahyouList,false,true));
+				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, doraList, uraList,false,true));
 			}
 		}
 		return agari.get(0);
@@ -402,17 +402,37 @@ class Agari {
 
 	}
 
-	void countDora(List<Tile> dorahyouList) {
-		for (Tile t : dorahyouList) {
-			//ドラ表示からドラを計算
+	void countDora(List<Integer> doraList, List<Integer> uraList) {
+		for (int t : doraList ) {
+			//表ドラからドラを計算
 			int dora = -1;
-			switch (t.id) {
+			switch (t) {
 			case 8:  dora = 0; break;
 			case 17: dora = 9; break;
 			case 26: dora = 18;	break;
 			case 30: dora = 27;	break;
 			case 33: dora = 31;	break;
-			default: dora = t.id+1;break;
+			default: dora = t+1;break;
+			}
+
+			//ドラを数える
+			num_dora += houra.te[dora];
+			for(Mentu m:houra.fuuro){
+				for(int p:m.pai){
+					if(p==dora)num_dora++;
+				}
+			}
+		}
+		for (int t : uraList ) {
+			//裏ドラからドラを計算
+			int dora = -1;
+			switch (t) {
+			case 8:  dora = 0; break;
+			case 17: dora = 9; break;
+			case 26: dora = 18;	break;
+			case 30: dora = 27;	break;
+			case 33: dora = 31;	break;
+			default: dora = t+1;break;
 			}
 
 			//ドラを数える

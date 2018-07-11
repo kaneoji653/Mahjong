@@ -1,10 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Player {
 	int[] te = new int[34];
-	List<Tile> tehai = new ArrayList<>();
-	List<Tile> sutehai = new ArrayList<>();
+	List<Integer> sutehai = new ArrayList<>();
 	List<Mentu> fuuro = new ArrayList<>();
 	int num_fuuro = 0;
 	int num_kan = 0;
@@ -23,13 +23,13 @@ public class Player {
 	boolean isChankan = false;
 
 	boolean isMenzen = true;
+	boolean isFuriten = false;
 	String name;
 	PlayerAI ai;
 	int point = 25000;
 
 	void initialize(){
 		te = new int[34];
-		tehai = new ArrayList<>();
 		sutehai = new ArrayList<>();
 		fuuro = new ArrayList<>();
 		num_fuuro = 0;
@@ -57,7 +57,7 @@ public class Player {
 	public boolean isOya(){
 		return this.jikaze==27;
 	}
-	
+
 	boolean is9shu(){
 		int cnt=0;
 		if(te[0]>=1)cnt++;
@@ -77,36 +77,33 @@ public class Player {
 	}
 
 	// 一枚ツモる
-	public void tumo(Tile tile) {
-		tehai.add(tile);
-		te[tile.id]++;
+	public void tumo(Integer tile) {
+		te[tile]++;
 		this.shanten = MillionMahjong.shanten(this);
 	}
 
-	public Tile dahai(Tile tumohai, boolean isReachTurn) {
-		Tile da = isReach&&!isReachTurn ? tumohai : selectDahai();
-		tehai.sort((t1, t2) -> t1.id - t2.id);
-
-		tehai.remove(da);
-		te[da.id]--;
+	public int dahai(Integer tumohai, boolean isReachTurn) {
+		int da = isReach&&!isReachTurn ? tumohai : selectDahai();
+		te[da]--;
 		sutehai.add(da);
 		return da;
 	}
 
 	// 捨て牌選択
-	public Tile selectDahai() {
-		List<Tile> dahaiKouho = new ArrayList<>();
-		for (int i = 0; i < tehai.size(); i++) {
-			Tile t = tehai.remove(i);
-			te[t.id]--;
+	public int selectDahai() {
+		List<Integer> dahaiKouho = new ArrayList<>();
+		for(int t=0;t<34;t++){
+			if(te[t]==0) continue;
+			te[t]--;
 			if (shanten == MillionMahjong.shanten(this)) {
 				dahaiKouho.add(t);
 			}
-			tehai.add(i, t);
-			te[t.id]++;
+			te[t]++;
 		}
 		if (dahaiKouho.isEmpty()) {
-			dahaiKouho.addAll(tehai);
+			for(int t=0;t<34;t++){
+				if(te[t]>=1) dahaiKouho.add(t);
+			}
 		}
 
 		return dahaiKouho.get((int) (Math.random() * dahaiKouho.size()));
@@ -115,11 +112,7 @@ public class Player {
 	void minkan(int id) {
 //		System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id] -= 3;
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-
-		int[] pai = { id, id, id, id };
+		int[] pai = {id,id,id,id};
 		fuuro.add(new Mentu(MentuType.MINKAN, pai));
 		num_fuuro++;
 		num_kan++;
@@ -129,8 +122,6 @@ public class Player {
 	void kakan(int id) {
 //		 System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id]--;
-		tehai.remove(tehai.indexOf(new Tile(id)));
-
 		Mentu f = null;
 		for (int i = 0; i < fuuro.size(); i++) {
 			f = fuuro.get(i);
@@ -146,11 +137,6 @@ public class Player {
 	void ankan(int id) {
 //		System.out.println(this.name+"：カン！("+new Tile(id)+")");
 		te[id] -= 4;
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-
 		int[] pai = { id, id, id, id };
 		fuuro.add(new Mentu(MentuType.ANKAN, pai));
 		num_fuuro++;
@@ -160,9 +146,6 @@ public class Player {
 	void pon(int id) {
 //		System.out.println(this.name+"：ポン！("+new Tile(id)+")");
 		te[id] -= 2;
-		tehai.remove(tehai.indexOf(new Tile(id)));
-		tehai.remove(tehai.indexOf(new Tile(id)));
-
 		int[] pai = { id, id, id };
 		fuuro.add(new Mentu(MentuType.PON, pai));
 		num_fuuro++;
@@ -173,9 +156,6 @@ public class Player {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id - 2]--;
 		te[id - 1]--;
-		tehai.remove(tehai.indexOf(new Tile(id - 2)));
-		tehai.remove(tehai.indexOf(new Tile(id - 1)));
-
 		int[] pai = { id - 2, id - 1, id };
 		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
@@ -186,9 +166,6 @@ public class Player {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id - 1]--;
 		te[id + 1]--;
-		tehai.remove(tehai.indexOf(new Tile(id - 1)));
-		tehai.remove(tehai.indexOf(new Tile(id + 1)));
-
 		int[] pai = { id - 1, id, id + 1 };
 		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
@@ -199,28 +176,14 @@ public class Player {
 //		 System.out.println(this.name+"：チー！("+new Tile(id)+")");
 		te[id + 1]--;
 		te[id + 2]--;
-		tehai.remove(tehai.indexOf(new Tile(id + 1)));
-		tehai.remove(tehai.indexOf(new Tile(id + 2)));
-
 		int[] pai = { id, id + 1, id + 2 };
 		fuuro.add(new Mentu(MentuType.CHI, pai));
 		num_fuuro++;
 		isMenzen = false;
 	}
 
-	String tehaiToString() {
-		String str = "";
-		for (int i = 0; i < tehai.size(); i++) {
-			if (i >= 1 && !tehai.get(i - 1).shu.equals(tehai.get(i).shu)) {
-				str += tehai.get(i - 1).shu;
-			}
-			str += tehai.get(i).kazu;
-		}
-		str += tehai.get(tehai.size() - 1).shu;
-		for (int i = num_fuuro - 1; i >= 0; i--) {
-			str += fuuro.get(i);
-		}
-		return (str);
+	String tehaiToString(){
+		return Arrays.toString(te);
 	}
 
 	@Override
