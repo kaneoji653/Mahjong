@@ -46,24 +46,27 @@ class Agari {
 		this.isTumo = isTumo;
 		this.isChitoi=isChitoi;
 		this.isKokushi=isKokushi;
-		this.makeYaku();
+		makeYaku();
 		countDora(doraList,uraList);
 		han=num_dora+num_yaku;
 		countFu();
 	}
 
-	public static Agari agari(Player houra,Player houju, int agarihai, boolean isTumo, List<Integer> doraList, List<Integer> uraList) {
+	public static Agari agari(Player houra,Player houju, int agarihai,  List<Integer> doraList, List<Integer> uraList) {
+		boolean isTumo = (houju==null);
 		List<Agari> agari = new ArrayList<>();
 
 		// 頭選択
 		List<Integer> headKouho = new ArrayList<>();
-		for (int i = 0; i < 34; i++) {
-			if (houra.te[i] >= 2) {
+		for (int i=0;i<34;i++) {
+			if (houra.tm.te[i]>=2){
 				headKouho.add(i);
 			}
 		}
+		
+//		System.out.println("headKouhoSize="+headKouho.size());
 		for (Integer head : headKouho) {
-			int[] te = Arrays.copyOf(houra.te, houra.te.length);
+			int[] te = Arrays.copyOf(houra.tm.te, houra.tm.te.length);
 			te[head] -= 2;
 
 			List<MatiType> matiKouho = new ArrayList<>();
@@ -198,7 +201,7 @@ class Agari {
 		int[] te = new int[34];
 		if(isChitoi){
 			for(int i=0;i<34;i++){
-				if(houra.te[i]==2){
+				if(houra.tm.te[i]==2){
 					te[i]=2;
 					if ((i%9==0||i%9==8)&&i<27) cnt_19++;
 					switch (i/9) {
@@ -396,13 +399,13 @@ class Agari {
 				num_yakuman++;
 				System.out.println(yakumanMei[i]);
 			}
-
 		}
 
 
 	}
 
 	void countDora(List<Integer> doraList, List<Integer> uraList) {
+		if(doraList==null) return;
 		for (int t : doraList ) {
 			//表ドラからドラを計算
 			int dora = -1;
@@ -416,13 +419,14 @@ class Agari {
 			}
 
 			//ドラを数える
-			num_dora += houra.te[dora];
+			num_dora += houra.tm.te[dora];
 			for(Mentu m:houra.fuuro){
 				for(int p:m.pai){
 					if(p==dora)num_dora++;
 				}
 			}
 		}
+		if(uraList==null) return;
 		for (int t : uraList ) {
 			//裏ドラからドラを計算
 			int dora = -1;
@@ -436,7 +440,7 @@ class Agari {
 			}
 
 			//ドラを数える
-			num_dora += houra.te[dora];
+			num_dora += houra.tm.te[dora];
 			for(Mentu m:houra.fuuro){
 				for(int p:m.pai){
 					if(p==dora)num_dora++;
@@ -447,7 +451,7 @@ class Agari {
 
 	void print(){
 		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
-		System.out.println(houra.tehaiToString());
+		houra.tm.print();
 		if(num_yakuman!=0){
 			for (int i=0;i<12;i++) {
 				if (yakuman[i]) {

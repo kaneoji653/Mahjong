@@ -13,7 +13,7 @@ public class MillionMahjong {
 		PointManager pm = new PointManager(player);
 
 		int cnt=0;
-		while(++cnt<=10000){
+		while(++cnt<=100000){
 			pm.initialize();
 			int kyoku = 0;
 			while(kyoku<8 || kyoku<12&&pm.isShaNyu()) {
@@ -106,11 +106,11 @@ public class MillionMahjong {
 			//１巡目のみ
 			if(isFirstTurn){
 				// 九種チェック
-				if(p.is9shu()){
+				if(p.tm.is9shu()){
 					if(p.ai.kyushuSelect()){
 						if(useLog){
 							System.out.println(p.name+"：九種九牌");
-							System.out.println(p.tehaiToString());
+							p.tm.print();
 						}
 						nagare9shu=true;
 						break dahaiWait;
@@ -135,31 +135,28 @@ public class MillionMahjong {
 			}
 
 			//ツモ和了判定
-			if (!isNakiTurn && p.shanten==-1){
-				if(Agari.agari(p,null,tumohai,true,new ArrayList<>(),new ArrayList<>()).han>=1) {
+			if (!isNakiTurn && p.tm.shantenUpdate()==-1 ){
+				p.isHaitei = yama.isEmpty();
+				p.isTenho = isFirstTurn&&p.isOya();
+				p.isChiho = isFirstTurn&&!p.isOya();
+				Agari a=Agari.agari(p,null,tumohai,null,null);
+				if(a.han>=1||a.num_yakuman>=1){
 					if (p.ai.tsumoSelect()) {
 //						System.out.println(p + ":ツモ！(" + tumohai + ")");
-						if (yama.isEmpty()) p.isHaitei = true;
-						if(isFirstTurn&&p.isOya()) p.isTenho=true;
-						if(isFirstTurn&&!p.isOya()) p.isChiho=true;
-
-//						if (p.isReach) {
-//							for (int i = 0; i < total_kan + 1; i++) {
-//								doraList.add(wanpai.remove(0));
-//							}
-//						}
-						agari=Agari.agari(p,null, tumohai, true, doraList, (p.isReach?uraList:new ArrayList<>()));
+						agari=Agari.agari(p,null, tumohai, doraList, (p.isReach?uraList:null));
 						break dahaiWait;
 					}
 				}
 			}
+			p.isTenho = false;
+			p.isChiho = false;
 			p.isRinshan = false;
 
 			//カン判定
 			if (!yama.isEmpty() && !isNakiTurn) {
 				// 暗カン
 				for (int i = 0; i < 34; i++) {
-					if (p.te[i] == 4) {
+					if (p.tm.te[i] == 4) {
 						if (p.ai.ankanSelect(i)) {
 							p.ankan(i);
 							total_kan++;
@@ -178,25 +175,29 @@ public class MillionMahjong {
 				// 加カン
 				for (int i = 0; i < p.num_fuuro; i++) {
 					int id = p.fuuro.get(i).pai[0];
-					if (p.fuuro.get(i).type == MentuType.PON && p.te[id] == 1) {
+					if (p.fuuro.get(i).type == MentuType.PON && p.tm.te[id] == 1) {
 						if (p.ai.kakanSelect(id)) {
 							p.kakan(id);
 							for(Player all:player) all.isIppatu=false;
 
 							//チャンカン判定
-							for (int j = 1; j <= 3; j++) {
-								Player ro = player[(ban + j) % 4];
-								if (ro.shanten == 0 && !ro.sutehai.contains(id) && ronCheck(ro, id)) {
-									if (ro.ai.ronSelect()) {
-										ro.isChankan = true;
-//										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p);
-										ro.te[id]++;
-										agari=Agari.agari(ro, p, id, false, doraList, (p.isReach?uraList:new ArrayList<>()));
-										break dahaiWait;
+							for(int j=1;j<=3;j++){
+								Player ro = player[(ban+j)%4];
+								ro.tm.te[id]++;
+								ro.isChankan = true;
+								if (ro.tm.shantenUpdate()==-1 && !ro.sutehai.contains(id)) {
+									Agari a=Agari.agari(ro,p,id,null,null);
+									if(a.han>=1||a.num_yakuman>=1){
+										if (ro.ai.ronSelect()) {
+	//										System.out.println(ro + ":チャンカンロン！(" + id + ") 放銃：" + p.name);
+											agari=Agari.agari(ro, p, id, doraList, (p.isReach?uraList:null));
+											break dahaiWait;
+										}
 									}
 								}
+								ro.isChankan=false;
+								ro.tm.te[id]--;
 							}
-
 							tumohai = yama.remove(0); // とりあえず山の上から引く。
 							player[ban].tumo(tumohai);
 							p.isRinshan = true;
@@ -208,7 +209,7 @@ public class MillionMahjong {
 
 			//リーチ判定
 			boolean isReachTurn=false;
-			if (!p.isReach && yama.size() >= 4 && p.shanten <= 0 && p.isMenzen && p.point>=1000) {
+			if (!p.isReach && yama.size() >= 4 && p.tm.shantenUpdate() <= 0 && p.isMenzen && p.point>=1000) {
 				if (p.ai.reachSelect()) {
 					isReachTurn=true;
 					p.isReach = true;
@@ -225,18 +226,20 @@ public class MillionMahjong {
 
 			//ロン判定
 			for (int i=1;i<=3;i++) {
-				Player ro = player[(ban + i) % 4];
-				if (ro.shanten == 0 && !ro.sutehai.contains(da) && ronCheck(ro, da)) {
-					if (ro.ai.ronSelect()) {
-						if (yama.isEmpty()) {
-							ro.isHoutei = true;
+				Player ro =player[(ban+i)%4];
+				ro.tm.te[da]++;
+				ro.isHoutei = yama.isEmpty();
+				if(ro.tm.shantenUpdate()==-1 && !ro.sutehai.contains(da)){
+					Agari a=Agari.agari(ro,p,da,null,null);
+					if(a.han>=1||a.num_yakuman>=1){
+						if (ro.ai.ronSelect()) {
+	//						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
+							agari=Agari.agari(ro, p, da, doraList, (p.isReach?uraList:null));
+							break dahaiWait;
 						}
-//						System.out.println(ro + ":ロン！(" + da + ") 放銃：" + p);
-						ro.te[da]++;
-						agari=Agari.agari(ro, p, da, false, doraList, (p.isReach?uraList:new ArrayList<>()));
-						break dahaiWait;
 					}
 				}
+				ro.tm.te[da]--;
 			}
 
 			//ロンされなかったら、明カンとリーチ成立
@@ -275,7 +278,7 @@ public class MillionMahjong {
 					if (tg.isReach) {
 						continue;
 					}
-					if (tg.te[da]==3) {
+					if (tg.tm.te[da]==3) {
 						if (tg.ai.minkanSelect(da)) {
 							tg.minkan(da);
 							for(Player all:player) all.isIppatu=false;
@@ -293,7 +296,7 @@ public class MillionMahjong {
 				for (int i=1;i<=3;i++) {
 					Player tg = player[(ban + i) % 4];
 					if (tg.isReach)continue;
-					if (tg.te[da]>=2){
+					if (tg.tm.te[da]>=2){
 						if (tg.ai.ponSelect(da)) {
 							tg.pon(da);
 							for(Player all:player) all.isIppatu=false;
@@ -309,7 +312,7 @@ public class MillionMahjong {
 				Player tg = player[(ban+1)%4];
 				if (!tg.isReach) {
 					//12(3)の形
-					if (da<27 && da%9!=0 && da%9!=1 && tg.te[da-2]>=1 && tg.te[da-1]>=1) {
+					if (da<27 && da%9!=0 && da%9!=1 && tg.tm.te[da-2]>=1 && tg.tm.te[da-1]>=1) {
 						if (tg.ai.chii0Select(da)) {
 							tg.chii0(da);
 							for(Player all:player) all.isIppatu=false;
@@ -320,9 +323,9 @@ public class MillionMahjong {
 						}
 					}
 					//1(2)3の形
-					if (da<27 && da%9!=0 && da%9!=8 && tg.te[da-1]>=1 && tg.te[da+1]>=1) {
-						if (tg.ai.chii0Select(da)) {
-							tg.chii0(da);
+					if (da<27 && da%9!=0 && da%9!=8 && tg.tm.te[da-1]>=1 && tg.tm.te[da+1]>=1) {
+						if (tg.ai.chii1Select(da)) {
+							tg.chii1(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban+1)%4;
@@ -331,9 +334,9 @@ public class MillionMahjong {
 						}
 					}
 					//(1)23の形
-					if (da<27 && da%9!=7 && da%9!=8 && tg.te[da+1]>=1 && tg.te[da+2]>=1) {
-						if (tg.ai.chii0Select(da)) {
-							tg.chii0(da);
+					if (da<27 && da%9!=7 && da%9!=8 && tg.tm.te[da+1]>=1 && tg.tm.te[da+2]>=1) {
+						if (tg.ai.chii2Select(da)) {
+							tg.chii2(da);
 							for(Player all:player) all.isIppatu=false;
 							isFirstTurn = false;
 							ban = (ban+1)%4;
@@ -376,134 +379,4 @@ public class MillionMahjong {
 		
 		return !nagare9shu && !nagare4fuu && !nagare4kan && !nagare4reach;
 	}
-
-	//idでロンできるかを返す。役はなくてもよい
-	static boolean ronCheck(Player ro, int id) {
-		ro.te[id]++;
-		boolean canRon = shanten(ro)==-1 && Agari.agari(ro,null,id,false,new ArrayList<>(),new ArrayList<>()).han>=1;
-		ro.te[id]--;
-		return canRon;
-	}
-
-	static int shanten(Player p) {
-		int[] te = p.te;
-
-		// 普通手のシャンテン
-		int shanten = selectBlock(te, p.num_fuuro, 0, 0, true);
-
-		// メンゼンならチートイと国士のシャンテン計算
-		if (p.num_fuuro == 0) {
-			// 七対子のシャンテン
-			int shanten_chitoi = 6;
-			if (p.num_fuuro == 0) {
-				for (int i = 0; i < 34; i++) {
-					if (te[i] >= 2) {
-						shanten_chitoi--;
-					}
-				}
-			}
-
-			// 国士無双のシャンテン
-			int shanten_kokushi = 14;
-			int kokushiHead = 0;
-			if (te[0]>=1)shanten_kokushi--; if(te[0]>=2)kokushiHead=1;
-			if (te[8]>=1)shanten_kokushi--; if(te[8]>=2)kokushiHead=1;
-			if (te[9]>=1)shanten_kokushi--; if(te[9]>=2)kokushiHead=1;
-			if (te[17]>=1)shanten_kokushi--; if(te[17]>=2)kokushiHead=1;
-			if (te[18]>=1)shanten_kokushi--; if(te[18]>=2)kokushiHead=1;
-			if (te[26]>=1)shanten_kokushi--; if(te[26]>=2)kokushiHead=1;
-			if (te[27]>=1)shanten_kokushi--; if(te[27]>=2)kokushiHead=1;
-			if (te[28]>=1)shanten_kokushi--; if(te[28]>=2)kokushiHead=1;
-			if (te[29]>=1)shanten_kokushi--; if(te[29]>=2)kokushiHead=1;
-			if (te[30]>=1)shanten_kokushi--; if(te[30]>=2)kokushiHead=1;
-			if (te[31]>=1)shanten_kokushi--; if(te[31]>=2)kokushiHead=1;
-			if (te[32]>=1)shanten_kokushi--; if(te[32]>=2)kokushiHead=1;
-			if (te[33]>=1)shanten_kokushi--; if(te[33]>=2)kokushiHead=1;
-			shanten_kokushi -= kokushiHead;
-
-			// 最小のシャンテン数を返す
-			shanten = Math.min(shanten, shanten_chitoi);
-			shanten = Math.min(shanten, shanten_kokushi);
-		}
-		return shanten;
-	}
-
-	//ブロックを数えてシャンテン数を計算
-	//できれば高速化したい（計算時間の99%はここなので高速化は重要）
-	static int selectBlock(int[] te, int men, int ta, int head, boolean shortcut) {
-		if (men + ta == 4) {
-			return 8 - 2 * men - ta - head;
-		}
-		int min_shanten = 8;
-
-		// 頭選択
-		if (head == 0) {
-			List<Integer> headKouho = new ArrayList<>();
-			for (int i = 0; i < 34; i++) {
-				if (te[i] >= 2) {
-					headKouho.add(i);
-				}
-			}
-			for (Integer h : headKouho) {
-				te[h] -= 2;
-				min_shanten = Math.min(min_shanten, selectBlock(te, men, ta, head + 1, true));
-				te[h] += 2;
-			}
-		}
-
-		// 面子選択
-		if(shortcut){
-			List<int[]> mentuKouho = new ArrayList<>();
-			for (int i = 0; i < 34; i++) {
-				if (te[i] >= 3) {
-					int[] koutu = { i, i, i };
-					mentuKouho.add(koutu);
-				}
-				if ((0 <= i && i <= 6 || 9 <= i && i <= 15 || 18 <= i && i <= 24) && te[i] >= 1 && te[i + 1] >= 1
-						&& te[i + 2] >= 1) {
-					int[] shuntu = { i, i + 1, i + 2 };
-					mentuKouho.add(shuntu);
-				}
-			}
-			for (int[] m : mentuKouho) {
-				te[m[0]]--;
-				te[m[1]]--;
-				te[m[2]]--;
-				min_shanten = Math.min(min_shanten, selectBlock(te, men + 1, ta, head, true));
-				te[m[0]]++;
-				te[m[1]]++;
-				te[m[2]]++;
-			}
-		}
-
-		// ターツ選択
-		List<int[]> tatuKouho = new ArrayList<>();
-		for (int i = 0; i < 34; i++) {
-			// トイツ
-			if (te[i] >= 2) {
-				int[] toitu = { i, i };
-				tatuKouho.add(toitu);
-			}
-			// カンチャン
-			if ((0 <= i && i <= 6 || 9 <= i && i <= 15 || 18 <= i && i <= 24) && te[i] >= 1 && te[i + 2] >= 1) {
-				int[] kanchan = { i, i + 2 };
-				tatuKouho.add(kanchan);
-			}
-			// ペンチャン・リャンメン
-			if ((0 <= i && i <= 7 || 9 <= i && i <= 16 || 18 <= i && i <= 25) && te[i] >= 1 && te[i + 1] >= 1) {
-				int[] ryanmen = { i, i + 1 };
-				tatuKouho.add(ryanmen);
-			}
-		}
-		for (int[] t : tatuKouho) {
-			te[t[0]]--;
-			te[t[1]]--;
-			min_shanten = Math.min(min_shanten, selectBlock(te, men, ta + 1, head,false));
-			te[t[0]]++;
-			te[t[1]]++;
-		}
-
-		return Math.min(min_shanten, 8 - 2 * men - ta - head);
-	}
-
 }

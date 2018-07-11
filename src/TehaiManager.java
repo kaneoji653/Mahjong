@@ -5,14 +5,32 @@ import java.util.List;
 public class TehaiManager{
 	static int[] mentatu=null;
 	int[] te;
+	int size;
 	int shanten;
 
 	public TehaiManager(int[] te){
 		if(mentatu==null) mentatu=makeMentatu();
 		this.te=te;
-		print();
+		for(int i=0;i<34;i++) size+=te[i];
 		shantenUpdate();
-		System.out.println(shanten);
+	}
+
+	boolean is9shu(){
+		int cnt=0;
+		if(te[0]>=1)cnt++;
+		if(te[8]>=1)cnt++;
+		if(te[9]>=1)cnt++;
+		if(te[17]>=1)cnt++;
+		if(te[18]>=1)cnt++;
+		if(te[26]>=1)cnt++;
+		if(te[27]>=1)cnt++;
+		if(te[28]>=1)cnt++;
+		if(te[29]>=1)cnt++;
+		if(te[30]>=1)cnt++;
+		if(te[31]>=1)cnt++;
+		if(te[32]>=1)cnt++;
+		if(te[33]>=1)cnt++;
+		return cnt>=9;
 	}
 
 	void print(){
@@ -57,20 +75,47 @@ public class TehaiManager{
 		System.out.println(str);
 	}
 
-//	public static void main(String[] args) {
-//		int[] te=new int[34];
-//		for(int i=0;i<13;i++){
-//			int x=(int)(Math.random()*34);
-//			if(te[x]<4){
-//				te[x]++;
-//			}else{
-//				i--;
-//			}
-//		}
-//		new TehaiManager(te);
-//	}
+	int shantenUpdate(){
+		size=0;
+		for(int i=0;i<34;i++) size+=te[i];
+		int num_fuuro=4-size/3;
+		shanten=10;
+		if(num_fuuro==0){
+			shanten=Math.min(shanten, shantenChitoi());
+			shanten=Math.min(shanten, shantenKokusi());
+		}
+		shanten=Math.min(shanten, shantenNormal(num_fuuro));
+		return shanten;
+	}
 
-	void shantenUpdate(){
+	int shantenChitoi(){
+		int shanten=6;
+		for(int i=0;i<34;i++){
+			if(te[i]>=2) shanten--;
+		}
+		return shanten;
+	}
+
+	int shantenKokusi(){
+		int shanten = 14;
+		int head = 0;
+		if (te[0]>=1)shanten--; if(te[0]>=2)head=1;
+		if (te[8]>=1)shanten--; if(te[8]>=2)head=1;
+		if (te[9]>=1)shanten--; if(te[9]>=2)head=1;
+		if (te[17]>=1)shanten--; if(te[17]>=2)head=1;
+		if (te[18]>=1)shanten--; if(te[18]>=2)head=1;
+		if (te[26]>=1)shanten--; if(te[26]>=2)head=1;
+		if (te[27]>=1)shanten--; if(te[27]>=2)head=1;
+		if (te[28]>=1)shanten--; if(te[28]>=2)head=1;
+		if (te[29]>=1)shanten--; if(te[29]>=2)head=1;
+		if (te[30]>=1)shanten--; if(te[30]>=2)head=1;
+		if (te[31]>=1)shanten--; if(te[31]>=2)head=1;
+		if (te[32]>=1)shanten--; if(te[32]>=2)head=1;
+		if (te[33]>=1)shanten--; if(te[33]>=2)head=1;
+		return shanten-head;
+	}
+
+	int shantenNormal(int num_fuuro){
 		List<Integer> headKouho = new ArrayList<>();
 		for(int i=0;i<34;i++){
 			if(te[i]>=2) headKouho.add(i);
@@ -81,21 +126,29 @@ public class TehaiManager{
 		for(int head:headKouho){
 			te[head]-=2;
 			int mt=0;
+			for(int i=27;i<34;i++){
+				if(te[i]>=3) mt+=10;
+				if(te[i]==2) mt+=1;
+			}
 			for(int i=0;i<3;i++){
 				mt+= mentatu[tehaiToInt(Arrays.copyOfRange(te, i*9, i*9+9))];
 			}
-			shanten=Math.min(shanten, 7-2*(mt/10)-(mt%10));
+			shanten=Math.min(shanten, 7-2*num_fuuro-2*(mt/10)-Math.min((4-num_fuuro-mt/10),(mt%10)));
 			te[head]+=2;
 		}
 		//頭なし
 		int mt=0;
+		for(int i=27;i<34;i++){
+			if(te[i]>=3) mt+=10;
+			if(te[i]==2) mt+=1;
+		}
 		for(int i=0;i<3;i++){
 			mt+= mentatu[tehaiToInt(Arrays.copyOfRange(te, i*9, i*9+9))];
 		}
-		shanten=Math.min(shanten, 8-2*(mt/10)-(mt%10));
-		this.shanten=shanten;
+		shanten=Math.min(shanten, 8-2*num_fuuro-2*(mt/10)-Math.min((4-num_fuuro-mt/10),(mt%10)));
+		return shanten;
 	}
-	//
+
 	static int[] makeMentatu(){
 		mentatu=new int[1953125]; //1953125= 5^9（全手牌を表現可）
 		Arrays.fill(mentatu, -1);

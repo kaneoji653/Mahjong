@@ -55,7 +55,7 @@ public class PointManager {
 		List<Player> tempai = new ArrayList<>();
 		List<Player> noten = new ArrayList<>();
 		for(int i=0;i<4;i++){
-			if(MillionMahjong.shanten(players[i])==0){
+			if(players[i].tm.shantenUpdate()==0){
 				tempai.add(players[i]);
 			}else{
 				noten.add(players[i]);
