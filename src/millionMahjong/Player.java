@@ -2,7 +2,8 @@ package millionMahjong;
 import java.util.ArrayList;
 import java.util.List;
 
-import myAI.PlayerAI;
+import myAI.AbstractPlayerAI;
+import myAI.BasePlayerAI;
 
 public class Player {
 	List<Integer> sutehai = new ArrayList<>();
@@ -27,7 +28,7 @@ public class Player {
 	boolean isMenzen = true;
 	boolean isFuriten = false;
 	String name;
-	PlayerAI ai;
+	AbstractPlayerAI ai;
 	int point = 25000;
 
 	void initialize(){
@@ -53,7 +54,7 @@ public class Player {
 		this.name = name;
 		this.bakaze=bakaze;
 		this.jikaze=jikaze;
-		ai = new PlayerAI();
+		ai = new BasePlayerAI();
 	}
 
 	public boolean isOya(){

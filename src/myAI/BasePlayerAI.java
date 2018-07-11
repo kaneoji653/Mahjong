@@ -1,6 +1,6 @@
 package myAI;
 
-public class PlayerAI extends AbstractPlayerAI {
+public class BasePlayerAI extends AbstractPlayerAI {
 	boolean naki=true;
 
 	public boolean kyushuSelect(){
@@ -8,19 +8,19 @@ public class PlayerAI extends AbstractPlayerAI {
 	}
 
 	public boolean kakanSelect(int id) {
-		return naki;
+		return false;
 	}
 
 	public boolean minkanSelect(int id) {
-		 return naki;
+		 return false;
 	}
 
 	public boolean ankanSelect(int id) {
-		return true;
+		return id>=27; //字牌だけカン
 	}
 
 	public boolean ponSelect(int id) {
-		return naki;
+		return false;
 	}
 
 	public boolean chi0Select(int id) {
