@@ -79,7 +79,7 @@ public class TehaiManager{
 		size=0;
 		for(int i=0;i<34;i++) size+=te[i];
 		int num_fuuro=4-size/3;
-		shanten=10;
+		shanten=13;
 		if(num_fuuro==0){
 			shanten=Math.min(shanten, shantenChitoi());
 			shanten=Math.min(shanten, shantenKokusi());
@@ -97,7 +97,7 @@ public class TehaiManager{
 	}
 
 	int shantenKokusi(){
-		int shanten = 14;
+		int shanten = 100;
 		int head = 0;
 		if (te[0]>=1)shanten--; if(te[0]>=2)head=1;
 		if (te[8]>=1)shanten--; if(te[8]>=2)head=1;

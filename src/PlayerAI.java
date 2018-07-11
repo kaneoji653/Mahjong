@@ -3,7 +3,7 @@ public class PlayerAI {
 	boolean naki=true;
 
 	boolean kyushuSelect(){
-		return true;
+		return false;
 	}
 
 	boolean kakanSelect(int id) {

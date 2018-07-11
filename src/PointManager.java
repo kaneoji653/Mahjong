@@ -9,6 +9,28 @@ public class PointManager {
 	PointManager(Player[] players){
 		this.players=players;
 	}
+	
+	int rank(int no){
+		int r=1;
+		for(int i=0;i<=no-1;i++){
+			if(players[no].point<=players[i].point) r++;
+		}
+		for(int i=no+1;i<4;i++){
+			if(players[no].point<players[i].point) r++;			
+		}
+		return r;
+	}
+	
+	void scoreUpdate(){
+		for(int i=0;i<4;i++){
+			switch(rank(i)){
+			case 1 : players[i].score+=3; break;
+			case 2 : players[i].score+=1; break;
+			case 3 : players[i].score-=1; break;
+			case 4 : players[i].score-=3; break;
+			}
+		}
+	}
 
 	void initialize(){
 		honba=0;
@@ -39,9 +61,16 @@ public class PointManager {
 		return true;
 	}
 
-	void print(){
+	void printPoint(){
 		for(int i=0;i<4;i++){
 			System.out.print(players[i].name+":"+players[i].point+" ");
+		}
+		System.out.println();
+	}
+
+	void printScore(){
+		for(int i=0;i<4;i++){
+			System.out.print(players[i].name+":"+players[i].score+" ");
 		}
 		System.out.println();
 	}

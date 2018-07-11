@@ -2,13 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-//	int[] te = new int[34];
 	List<Integer> sutehai = new ArrayList<>();
 	List<Mentu> fuuro = new ArrayList<>();
 	int num_fuuro = 0;
 	int num_kan = 0;
-//	int shanten;
 	TehaiManager tm;
+	int score=0;
 
 	int jikaze;
 	int bakaze;
@@ -74,11 +73,12 @@ public class Player {
 	// 捨て牌選択
 	public int selectDahai() {
 		List<Integer> dahaiKouho = new ArrayList<>();
-		int shanten=tm.shantenUpdate();
+		boolean kokusiMode = tm.is9shu();
+		int shanten=(kokusiMode ? tm.shantenKokusi() : tm.shantenUpdate());
 		for(int t=0;t<34;t++){
 			if(tm.te[t]==0) continue;
 			tm.te[t]--;
-			if (shanten == tm.shantenUpdate()) {
+			if (shanten == (kokusiMode ? tm.shantenKokusi() : tm.shantenUpdate())) {
 				dahaiKouho.add(t);
 			}
 			tm.te[t]++;

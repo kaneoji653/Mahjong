@@ -13,29 +13,19 @@ public class MillionMahjong {
 		PointManager pm = new PointManager(player);
 
 		int cnt=0;
-		while(++cnt<=100000){
+		while(++cnt<=50000000){
+			if(cnt%10000==0) System.out.println(cnt+"試合");
 			pm.initialize();
 			int kyoku = 0;
 			while(kyoku<8 || kyoku<12&&pm.isShaNyu()) {
 				boolean tokushuNagare = !kyokuStart(player,pm,kyoku,false);
 				if(pm.existTobi()) break;
 				if(pm.honba==0)kyoku++;
-				if(kyoku==7 && pm.honba>=1 && !tokushuNagare && !pm.isShaNyu() && rank(player,3)==1) break;
+				if(kyoku==7 && pm.honba>=1 && !tokushuNagare && !pm.isShaNyu() && pm.rank(3)==1) break;
 			}
-			pm.print();
-			System.out.println(rank(player,0)+" "+rank(player,1)+" "+rank(player,2)+" "+rank(player,3));
+			pm.scoreUpdate();
 		}
-	}
-	
-	public static int rank(Player[] ps,int no){
-		int r=1;
-		for(int i=0;i<=no-1;i++){
-			if(ps[no].point<=ps[i].point) r++;
-		}
-		for(int i=no+1;i<4;i++){
-			if(ps[no].point<ps[i].point) r++;			
-		}
-		return r;
+		pm.printScore();
 	}
 
 	public static boolean kyokuStart(Player[] player, PointManager pm, int kyoku, boolean useLog) {
@@ -45,7 +35,7 @@ public class MillionMahjong {
 			case 1: System.out.println("南"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
 			case 2: System.out.println("西"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
 			}
-			pm.print();
+			pm.printPoint();
 			System.out.println();
 		}
 

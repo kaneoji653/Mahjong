@@ -154,11 +154,10 @@ class Agari {
 			}
 		}
 
-		if (agari.isEmpty()) {
+		if(agari.isEmpty()) {
 			if(headKouho.size()==7){
 				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, doraList, uraList,true,false));
 			}else{
-				System.out.println("こくしむそおおおおおおおおおおおおおお");
 				agari.add(new Agari(houra, houju, -1, null, MatiType.TANKI, isTumo, doraList, uraList,false,true));
 			}
 		}
@@ -166,7 +165,7 @@ class Agari {
 	}
 
 	void countFu(){
-		if(isChitoi){
+		if(isChitoi||isKokushi){
 			this.fu=25;
 			return;
 		}
@@ -212,7 +211,7 @@ class Agari {
 					}
 				}
 			}
-		}else{
+		}else if(!isKokushi){
 			te[head] += 2;
 			if((head%9==0||head%9==8)&&head<27)cnt_19+=2;
 			switch (head/9) {
@@ -270,7 +269,7 @@ class Agari {
 		yakuman[1] = houra.isTenho;
 		yakuman[2] = houra.isChiho;
 
-		if(!isChitoi){
+		if(!isChitoi&&!isKokushi){
 			yaku[14] = houra.isMenzen && mati == MatiType.RYAMMEN && head != houra.jikaze && head != houra.bakaze && head != 31
 					&& head != 32 && head != 33 && mentu[0].type == MentuType.SHUN && mentu[1].type == MentuType.SHUN
 					&& mentu[2].type == MentuType.SHUN && mentu[3].type == MentuType.SHUN;
@@ -331,7 +330,7 @@ class Agari {
 					&& mentu[3].type == MentuType.SHUN && mentu[2].pai[0] == mentu[3].pai[0];
 		}
 
-		if(cnt_manzu==0 && cnt_pinzu==0 && cnt_souzu==0) yakuman[5]=true;
+		if(cnt_manzu==0 && cnt_pinzu==0 && cnt_souzu==0 && !isKokushi) yakuman[5]=true;
 		if (cnt_manzu == 0 && cnt_pinzu == 0 && cnt_souzu != 0 || cnt_manzu == 0 && cnt_pinzu != 0 && cnt_souzu == 0
 				|| cnt_manzu != 0 && cnt_pinzu == 0 && cnt_souzu == 0) {
 			if (cnt_jihai != 0) {
@@ -368,7 +367,7 @@ class Agari {
 			||	kouList.contains(28)&&kouList.contains(29)&&kouList.contains(30)&&head==27){
 			yakuman[7]=true;
 		}
-		yakuman[9]=true;
+		yakuman[9]=!isKokushi;
 		for(int i=0;i<34;i++){
 			if(i==19||i==20||i==21||i==23||i==25||i==32)continue;
 			if(te[i]>=1){
@@ -397,7 +396,6 @@ class Agari {
 		for(int i=0;i<12;i++){
 			if(yakuman[i]){
 				num_yakuman++;
-				System.out.println(yakumanMei[i]);
 			}
 		}
 
@@ -450,8 +448,8 @@ class Agari {
 	}
 
 	void print(){
-		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
-		houra.tm.print();
+//		System.out.println((isTumo? "ツモ：" : "ロン：")+ houra.name +(isTumo? "" : "←"+houju+""));
+//		houra.tm.print();
 		if(num_yakuman!=0){
 			for (int i=0;i<12;i++) {
 				if (yakuman[i]) {
@@ -460,9 +458,9 @@ class Agari {
 			}
 		}else{
 			printYaku();
-			System.out.println(this.fu +"符"+han+"翻");
+//			System.out.println(this.fu +"符"+han+"翻");
 		}
-		PointManager.printScore(this);
+//		PointManager.printScore(this);
 	}
 
 	void printYaku() {
