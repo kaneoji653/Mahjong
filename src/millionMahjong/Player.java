@@ -1,5 +1,8 @@
+package millionMahjong;
 import java.util.ArrayList;
 import java.util.List;
+
+import myAI.PlayerAI;
 
 public class Player {
 	List<Integer> sutehai = new ArrayList<>();

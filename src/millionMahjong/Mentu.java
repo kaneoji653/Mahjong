@@ -1,3 +1,4 @@
+package millionMahjong;
 
 public class Mentu {
 	MentuType type;

@@ -1,3 +1,4 @@
+package millionMahjong;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ public class MillionMahjong {
 				if(pm.honba==0)kyoku++;
 				if(kyoku==7 && pm.honba>=1 && !tokushuNagare && !pm.isShaNyu() && pm.rank(3)==1) break;
 			}
+			pm.printPoint();
 			pm.scoreUpdate();
 		}
 		pm.printScore();
