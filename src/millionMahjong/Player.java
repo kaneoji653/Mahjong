@@ -13,7 +13,7 @@ public class Player {
 	public TehaiManager tm;
 	int score=0;
 
-	public int jikaze;
+	int jikaze;
 	public int bakaze;
 	boolean isTenho=false;
 	boolean isChiho=false;
@@ -30,6 +30,22 @@ public class Player {
 	String name;
 	BasePlayerAI ai;
 	int point = 25000;
+
+	public List<Mentu> getFuuro() {
+		return new ArrayList<>(fuuro);
+	}
+
+	public int getJikaze() {
+		return jikaze;
+	}
+
+	public boolean isReach() {
+		return isReach;
+	}
+
+	public boolean isMenzen() {
+		return isMenzen;
+	}
 
 	void initialize(){
 		tm=new TehaiManager(new int[34]);
@@ -56,22 +72,22 @@ public class Player {
 		this.jikaze=jikaze;
 		setAI(new KaneojiAI000(this));
 	}
-	
+
 	public void setAI(BasePlayerAI ai){
 		this.ai=ai;
 	}
-	
+
 	public boolean isOya(){
 		return this.jikaze==27;
 	}
 
 	// 一枚ツモる
-	public void tumo(Integer tile) {
+	void tumo(Integer tile) {
 		tm.te[tile]++;
 		tm.shantenUpdate();
 	}
 
-	public int dahai(Integer tumohai, boolean isReachTurn) {
+	int dahai(Integer tumohai, boolean isReachTurn) {
 		int da = isReach&&!isReachTurn ? tumohai : ai.dahaiSelect();//本来はゲームで見える情報だけ渡すべき。
 		tm.te[da]--;
 		sutehai.add(da);

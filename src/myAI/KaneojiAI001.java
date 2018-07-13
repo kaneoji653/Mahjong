@@ -8,11 +8,11 @@ import millionMahjong.Player;
 public class KaneojiAI001 extends BasePlayerAI {
 	Player me;
 	boolean naki=false;
-	
+
 	public KaneojiAI001(Player me) {
 		this.me=me;
 	}
-	
+
 	public int dahaiSelect(){
 		List<Integer> dahaiKouho = new ArrayList<>();
 		int shanten= me.tm.shantenUpdate();
@@ -32,13 +32,13 @@ public class KaneojiAI001 extends BasePlayerAI {
 
 		return dahaiKouho.get((int) (Math.random() * dahaiKouho.size()));
 	}
-	
+
 	public boolean kyushuSelect(){
 		return me.tm.shantenKokusi()>=3;
 	}
 
 	public boolean kakanSelect(int id) {
-		return id==me.bakaze||id==me.jikaze||id==31||id==32||id==33;//役牌だけ
+		return id==me.bakaze||id==me.getJikaze()||id==31||id==32||id==33;//役牌だけ
 	}
 
 	public boolean minkanSelect(int id) {
@@ -50,7 +50,7 @@ public class KaneojiAI001 extends BasePlayerAI {
 	}
 
 	public boolean ponSelect(int id) {
-		return me.tm.te[id]==2 &&(id==me.bakaze||id==me.jikaze||id==31||id==32||id==33);//役牌だけ
+		return me.tm.te[id]==2 &&(id==me.bakaze||id==me.getJikaze()||id==31||id==32||id==33);//役牌だけ
 	}
 
 	public boolean chi0Select(int id) {
