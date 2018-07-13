@@ -1,5 +1,6 @@
 package millionMahjong;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import myAI.BasePlayerAI;
@@ -10,11 +11,11 @@ public class Player {
 	List<Mentu> fuuro = new ArrayList<>();
 	int num_fuuro = 0;
 	int num_kan = 0;
-	public TehaiManager tm;
+	TehaiManager tm;
 	int score=0;
 
 	int jikaze;
-	public int bakaze;
+	public int bakaze;//プレイヤーにあるべきではない
 	boolean isTenho=false;
 	boolean isChiho=false;
 	boolean isReach = false;
@@ -24,8 +25,8 @@ public class Player {
 	boolean isHoutei = false;
 	boolean isRinshan = false;
 	boolean isChankan = false;
-
-	public boolean isMenzen = true;
+	boolean visible = false; //他家からみえるか
+	boolean isMenzen = true;
 	boolean isFuriten = false;
 	String name;
 	BasePlayerAI ai;
@@ -33,6 +34,10 @@ public class Player {
 
 	public List<Mentu> getFuuro() {
 		return new ArrayList<>(fuuro);
+	}
+
+	public TehaiManager getTM(){
+		return visible ? new TehaiManager(Arrays.copyOf(tm.te, 34)) : null;
 	}
 
 	public int getJikaze() {
@@ -48,7 +53,7 @@ public class Player {
 	}
 
 	void initialize(){
-		tm=new TehaiManager(new int[34]);
+		Arrays.fill(tm.te, 0);
 		sutehai = new ArrayList<>();
 		fuuro = new ArrayList<>();
 		num_fuuro = 0;
@@ -70,6 +75,8 @@ public class Player {
 		this.name = name;
 		this.bakaze=bakaze;
 		this.jikaze=jikaze;
+		this.tm=new TehaiManager(new int[34]);
+		this.initialize();
 		setAI(new KaneojiAI000(this));
 	}
 

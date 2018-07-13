@@ -1,5 +1,7 @@
 package myAI;
 
+import millionMahjong.GameInfo;
+
 public abstract class BasePlayerAI {
 	public abstract boolean kyushuSelect();
 	public abstract boolean kakanSelect(int tile);
@@ -13,4 +15,5 @@ public abstract class BasePlayerAI {
 	public abstract boolean tsumoSelect();
 	public abstract boolean ronSelect();
 	public abstract int dahaiSelect();
+	public abstract void update(GameInfo gi);
 }

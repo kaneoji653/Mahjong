@@ -12,13 +12,21 @@ public class MillionMahjong {
 		Player[] player = new Player[4];
 		for (int i=0;i<4;i++) {
 			player[i] = new Player("P"+(i+1), 27, 27+i);
+			player[i].initialize();
 		}
-		
+		player[0].visible=true;
 		player[0].setAI(new KaneojiAI001(player[0]));
+		player[0].visible=false;
+		player[1].visible=true;
 		player[1].setAI(new KaneojiAI000(player[1]));
+		player[1].visible=false;
+		player[2].visible=true;
 		player[2].setAI(new KaneojiAI001(player[2]));
+		player[2].visible=false;
+		player[3].visible=true;
 		player[3].setAI(new KaneojiAI000(player[3]));
-		
+		player[3].visible=false;
+
 		PointManager pm = new PointManager(player);
 		MessageManager mm = new MessageManager(false,false);
 
@@ -43,6 +51,11 @@ public class MillionMahjong {
 	}
 
 	public static boolean kyokuStart(Player[] player, PointManager pm, int kyoku, MessageManager mm) {
+		GameInfo gi=new GameInfo();
+		gi.players=player;
+		gi.pm=pm;
+		
+		
 		if(mm.useLog){
 			switch(kyoku/4){
 			case 0: System.out.println("東"+(1+kyoku%4)+"局　"+pm.honba+"本場　供託："+pm.kyotaku ); break;
@@ -216,7 +229,12 @@ public class MillionMahjong {
 			}
 
 			//打牌決定
+			p.visible=true;
+			gi.playerID=ban;
+			p.ai.update(gi);
 			int da = p.dahai(tumohai,isReachTurn);
+			p.visible=false;
+
 			if(!isReachTurn)p.isIppatu=false;
 			isNakiTurn = false;
 
@@ -257,7 +275,7 @@ public class MillionMahjong {
 			}
 
 			//四槓散了チェック
-			if(total_kan==5 || total_kan==4 
+			if(total_kan==5 || total_kan==4
 					&& !(player[0].num_kan==4 ||player[1].num_kan==4||player[2].num_kan==4 ||player[3].num_kan==4)){
 				mm.log("四槓散了");
 				break dahaiWait;
@@ -371,7 +389,7 @@ public class MillionMahjong {
 				pm.ron(agari);
 			}
 		}
-		
+
 		return isNormalRyukyoku;
 	}
 }

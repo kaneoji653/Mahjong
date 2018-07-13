@@ -14,19 +14,19 @@ public class ZettaiToituteMan extends KaneojiAI000 {
 	@Override
 	public int dahaiSelect() {
 		List<Integer> dahaiKouho = new ArrayList<>();
-		int shanten= me.tm.shantenUpdate();
+		int shanten= tm.shantenUpdate();
 		for(int t=0;t<34;t++){
-			if(me.tm.te[t]==0) continue;
-			if(me.tm.te[t]==1) return t;
-			me.tm.te[t]--;
-			if (shanten == me.tm.shantenUpdate()) {
+			if(tm.te[t]==0) continue;
+			if(tm.te[t]==1) return t;
+			tm.te[t]--;
+			if (shanten == tm.shantenUpdate()) {
 				dahaiKouho.add(t);
 			}
-			me.tm.te[t]++;
+			tm.te[t]++;
 		}
 		if (dahaiKouho.isEmpty()) {
 			for(int t=0;t<34;t++){
-				if(me.tm.te[t]>=1) dahaiKouho.add(t);
+				if(tm.te[t]>=1) dahaiKouho.add(t);
 			}
 		}
 

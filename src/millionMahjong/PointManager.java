@@ -6,6 +6,14 @@ public class PointManager {
 	Player[] players;
 	int honba=0;
 	int kyotaku=0;
+	
+	public int getHonba(){
+		return honba;
+	}
+
+	public int getKyotaku(){
+		return kyotaku;
+	}
 
 	PointManager(Player[] players){
 		this.players=players;

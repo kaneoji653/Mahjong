@@ -12,8 +12,6 @@ public class TehaiManager{
 	public TehaiManager(int[] te){
 		if(mentatu==null) mentatu=makeMentatu();
 		this.te=te;
-		for(int i=0;i<34;i++) size+=te[i];
-		shantenUpdate();
 	}
 	
 
