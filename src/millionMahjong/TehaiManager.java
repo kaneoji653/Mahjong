@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TehaiManager{
 	static int[] mentatu=null;
-	int[] te;
+	public int[] te;
 	int size;
 	int shanten;
 
@@ -15,8 +15,9 @@ public class TehaiManager{
 		for(int i=0;i<34;i++) size+=te[i];
 		shantenUpdate();
 	}
+	
 
-	boolean is9shu(){
+	public boolean is9shu(){
 		int cnt=0;
 		if(te[0]>=1)cnt++;
 		if(te[8]>=1)cnt++;
@@ -34,7 +35,7 @@ public class TehaiManager{
 		return cnt>=9;
 	}
 
-	void print(){
+	public void print(){
 		String str="";
 		boolean b;
 		//萬子
@@ -76,7 +77,7 @@ public class TehaiManager{
 		System.out.println(str);
 	}
 
-	int shantenUpdate(){
+	public int shantenUpdate(){
 		size=0;
 		for(int i=0;i<34;i++) size+=te[i];
 		int num_fuuro=4-size/3;
@@ -89,7 +90,7 @@ public class TehaiManager{
 		return shanten;
 	}
 
-	int shantenChitoi(){
+	public int shantenChitoi(){
 		int shanten=6;
 		for(int i=0;i<34;i++){
 			if(te[i]>=2) shanten--;
@@ -97,7 +98,7 @@ public class TehaiManager{
 		return shanten;
 	}
 
-	int shantenKokusi(){
+	public int shantenKokusi(){
 		int shanten = 13;
 		int head = 0;
 		if (te[0]>=1)shanten--; if(te[0]>=2)head=1;
@@ -116,7 +117,7 @@ public class TehaiManager{
 		return shanten-head;
 	}
 
-	int shantenNormal(int num_fuuro){
+	public int shantenNormal(int num_fuuro){
 		List<Integer> headKouho = new ArrayList<>();
 		for(int i=0;i<34;i++){
 			if(te[i]>=2) headKouho.add(i);

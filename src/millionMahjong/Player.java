@@ -2,19 +2,19 @@ package millionMahjong;
 import java.util.ArrayList;
 import java.util.List;
 
-import myAI.AbstractPlayerAI;
 import myAI.BasePlayerAI;
+import myAI.KaneojiAI000;
 
 public class Player {
 	List<Integer> sutehai = new ArrayList<>();
 	List<Mentu> fuuro = new ArrayList<>();
 	int num_fuuro = 0;
 	int num_kan = 0;
-	TehaiManager tm;
+	public TehaiManager tm;
 	int score=0;
 
-	int jikaze;
-	int bakaze;
+	public int jikaze;
+	public int bakaze;
 	boolean isTenho=false;
 	boolean isChiho=false;
 	boolean isReach = false;
@@ -25,10 +25,10 @@ public class Player {
 	boolean isRinshan = false;
 	boolean isChankan = false;
 
-	boolean isMenzen = true;
+	public boolean isMenzen = true;
 	boolean isFuriten = false;
 	String name;
-	AbstractPlayerAI ai;
+	BasePlayerAI ai;
 	int point = 25000;
 
 	void initialize(){
@@ -54,9 +54,13 @@ public class Player {
 		this.name = name;
 		this.bakaze=bakaze;
 		this.jikaze=jikaze;
-		ai = new BasePlayerAI();
+		setAI(new KaneojiAI000(this));
 	}
-
+	
+	public void setAI(BasePlayerAI ai){
+		this.ai=ai;
+	}
+	
 	public boolean isOya(){
 		return this.jikaze==27;
 	}
@@ -68,32 +72,10 @@ public class Player {
 	}
 
 	public int dahai(Integer tumohai, boolean isReachTurn) {
-		int da = isReach&&!isReachTurn ? tumohai : selectDahai();
+		int da = isReach&&!isReachTurn ? tumohai : ai.dahaiSelect();//本来はゲームで見える情報だけ渡すべき。
 		tm.te[da]--;
 		sutehai.add(da);
 		return da;
-	}
-
-	// 捨て牌選択
-	public int selectDahai() {
-		List<Integer> dahaiKouho = new ArrayList<>();
-		boolean kokusiMode = tm.is9shu();
-		int shanten=(kokusiMode ? tm.shantenKokusi() : tm.shantenUpdate());
-		for(int t=0;t<34;t++){
-			if(tm.te[t]==0) continue;
-			tm.te[t]--;
-			if (shanten == (kokusiMode ? tm.shantenKokusi() : tm.shantenUpdate())) {
-				dahaiKouho.add(t);
-			}
-			tm.te[t]++;
-		}
-		if (dahaiKouho.isEmpty()) {
-			for(int t=0;t<34;t++){
-				if(tm.te[t]>=1) dahaiKouho.add(t);
-			}
-		}
-
-		return dahaiKouho.get((int) (Math.random() * dahaiKouho.size()));
 	}
 
 	void minkan(int id) {
