@@ -25,10 +25,10 @@ public class PointManager {
 	void scoreUpdate(){
 		for(int i=0;i<4;i++){
 			switch(rank(i)){
-			case 1 : players[i].score+=3; break;
-			case 2 : players[i].score+=1; break;
-			case 3 : players[i].score-=1; break;
-			case 4 : players[i].score-=3; break;
+			case 1 : players[i].score+=75; break;
+			case 2 : players[i].score+=30; break;
+			case 3 : players[i].score+=0; break;
+			case 4 : players[i].score+=-105; break;
 			}
 		}
 	}

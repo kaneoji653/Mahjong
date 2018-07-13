@@ -35,7 +35,7 @@ public class KaneojiAI000 extends BasePlayerAI {
 	}
 
 	public boolean kyushuSelect(){
-		return false;
+		return true;
 	}
 
 	public boolean kakanSelect(int id) {

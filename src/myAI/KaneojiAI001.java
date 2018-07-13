@@ -15,12 +15,11 @@ public class KaneojiAI001 extends BasePlayerAI {
 	
 	public int dahaiSelect(){
 		List<Integer> dahaiKouho = new ArrayList<>();
-		boolean kokusiMode = me.tm.is9shu();
-		int shanten=(kokusiMode ? me.tm.shantenKokusi() : me.tm.shantenUpdate());
+		int shanten= me.tm.shantenUpdate();
 		for(int t=0;t<34;t++){
 			if(me.tm.te[t]==0) continue;
 			me.tm.te[t]--;
-			if (shanten == (kokusiMode ? me.tm.shantenKokusi() : me.tm.shantenUpdate())) {
+			if (shanten == me.tm.shantenUpdate()) {
 				dahaiKouho.add(t);
 			}
 			me.tm.te[t]++;
@@ -51,19 +50,19 @@ public class KaneojiAI001 extends BasePlayerAI {
 	}
 
 	public boolean ponSelect(int id) {
-		return id==me.bakaze||id==me.jikaze||id==31||id==32||id==33;//役牌だけ
+		return me.tm.te[id]==2 &&(id==me.bakaze||id==me.jikaze||id==31||id==32||id==33);//役牌だけ
 	}
 
 	public boolean chi0Select(int id) {
-		return !me.isMenzen;
+		return false;
 	}
 
 	public boolean chi1Select(int id) {
-		return !me.isMenzen;
+		return false;
 	}
 
 	public boolean chi2Select(int id) {
-		return !me.isMenzen;
+		return false;
 	}
 
 	public boolean reachSelect() {

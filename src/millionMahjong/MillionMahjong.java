@@ -5,7 +5,6 @@ import java.util.List;
 
 import myAI.KaneojiAI000;
 import myAI.KaneojiAI001;
-import myAI.ZettaiNakuMan;
 
 public class MillionMahjong {
 	public static void main(String[] args) {
@@ -16,8 +15,8 @@ public class MillionMahjong {
 		}
 		
 		player[0].setAI(new KaneojiAI001(player[0]));
-		player[1].setAI(new KaneojiAI001(player[1]));
-		player[2].setAI(new ZettaiNakuMan(player[2]));
+		player[1].setAI(new KaneojiAI000(player[1]));
+		player[2].setAI(new KaneojiAI001(player[2]));
 		player[3].setAI(new KaneojiAI000(player[3]));
 		
 		PointManager pm = new PointManager(player);
